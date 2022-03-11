@@ -22,7 +22,7 @@ pub(crate) fn process_cram_list(config: CramListConfig) -> Result<(), Error>{
                 .ok_or_else(|| Error::from(
                     format!("Path {} is not formatted properly.", path)
                 ))?;
-        println!("{}\t{}", id, path);
+        println!("{}\t{}", id, line);
     }
     Ok(())
 }
