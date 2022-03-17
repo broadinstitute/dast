@@ -1,12 +1,12 @@
-use crate::config::CramListConfig;
+use crate::config::FastqListConfig;
+use crate::error::Error;
 use fs_err::File;
 use std::io::{BufReader, BufRead};
-use crate::error::Error;
 use crate::nephrotic;
 
 const HEADER_FOR_TERRA: &str = "entity:cram_sample_id\tpath";
 
-pub(crate) fn process_cram_list(config: CramListConfig) -> Result<(), Error>{
+pub(crate) fn process_fastq_list(config: FastqListConfig) -> Result<(), Error>{
     let file = File::open(config.input)?;
     let reader = BufReader::new(file);
     println!("{}", HEADER_FOR_TERRA);
