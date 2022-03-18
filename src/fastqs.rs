@@ -6,7 +6,7 @@ use crate::nephrotic;
 use std::collections::HashMap;
 
 const HEADER_FOR_TERRA: &str =
-    "fastq1\tfastq2\tlibrary_name\tplatform_name\tplatform_unit\tentity:read_group\trun_date\tsample_id\tsequencing_center";
+    "entity:fastq_pair_id\tfastq1\tfastq2\tlibrary_name\tplatform_name\tplatform_unit\tread_group\trun_date\tsample_id\tsequencing_center";
 
 enum Partner {
     R1(String),
@@ -89,8 +89,8 @@ fn print_record(key: &str, fastq1: &str, fastq2: &str) -> Result<(), Error> {
     let platform_unit = "unknown";
     let run_date = "unknown";
     let sequencing_center = format!("Maybe {}", cohort);
-    println!("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", fastq1, fastq2, library_name, platform_name,
-             platform_unit, read_group, run_date, sample_id, sequencing_center);
+    println!("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", read_group, fastq1, fastq2, library_name,
+             platform_name, platform_unit, read_group, run_date, sample_id, sequencing_center);
     Ok(())
 }
 
