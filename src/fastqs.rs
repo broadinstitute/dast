@@ -87,8 +87,8 @@ fn print_record(key: &str, fastq1: &str, fastq2: &str) -> Result<(), Error> {
     let library_name = format!("{}_{}_{}_{}", cohort, sample_id, prefix, lane);
     let platform_name = "unknown";
     let platform_unit = "unknown";
-    let run_date = "unknown";
-    let sequencing_center = format!("Maybe {}", cohort);
+    let run_date = "2022-03-18";
+    let sequencing_center = format!("{}", cohort);
     println!("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", read_group, fastq1, fastq2, library_name,
              platform_name, platform_unit, read_group, run_date, sample_id, sequencing_center);
     Ok(())
