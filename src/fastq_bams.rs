@@ -13,7 +13,13 @@ pub(crate) fn process_fastq_bam_list(config: FastqBamsConfig)
             line.split('/')
                 .last()
                 .ok_or_else(|| { Error::from(format!("No slash in '{}'", line)) })?;
-        println!("{}\t{}", file_name, line);
+        const SUFFIX: &str = ".unmapped.bam";
+        let read_group =
+            file_name.strip_suffix(SUFFIX)
+                .ok_or_else(|| {
+                    Error::from(format!("File '{}' does not end with '{}'", file_name, SUFFIX))
+                })?;
+        println!("{}\t{}", read_group, line);
     }
     Ok(())
 }
