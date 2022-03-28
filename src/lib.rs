@@ -7,6 +7,8 @@ mod crams;
 mod fastqs;
 mod nephrotic;
 mod fastq_bams;
+mod group;
+mod col_names;
 
 pub fn run() -> Result<(), Error> {
     let config = Config::new()?;
@@ -19,6 +21,9 @@ pub fn run() -> Result<(), Error> {
         }
         Config::FastqBams(fastq_bam_list_config) => {
             fastq_bams::process_fastq_bam_list(fastq_bam_list_config)?
+        }
+        Config::Group(group_config) => {
+            group::group(group_config)?
         }
     }
     Ok(())
