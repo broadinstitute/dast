@@ -9,6 +9,7 @@ mod nephrotic;
 mod fastq_bams;
 mod group;
 mod col_names;
+mod ubams;
 
 pub fn run() -> Result<(), Error> {
     let config = Config::new()?;
@@ -24,6 +25,9 @@ pub fn run() -> Result<(), Error> {
         }
         Config::Group(group_config) => {
             group::group(group_config)?
+        }
+        Config::Ubams(ubams_config) => {
+            ubams::create_ubams_lists(ubams_config)?
         }
     }
     Ok(())
