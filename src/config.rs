@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use clap::{command, Command, arg, ArgMatches};
 use crate::error::Error;
 
@@ -7,6 +8,10 @@ pub(crate) enum Config {
     FastqBams(FastqBamsConfig),
     Group(GroupConfig),
     Ubams(UbamsConfig),
+}
+
+pub(crate) struct NitroConfig {
+    args: BTreeMap<String, Vec<String>>,
 }
 
 pub(crate) struct CramsConfig {
@@ -35,6 +40,7 @@ pub(crate) struct UbamsConfig {
 }
 
 mod names {
+    pub(crate) const NITRO: &str = "nitro";
     pub(crate) const CRAMS: &str = "crams";
     pub(crate) const FASTQS: &str = "fastqs";
     pub(crate) const FASTQ_BAMS: &str = "fastq-bams";
@@ -55,6 +61,10 @@ impl Config {
             .propagate_version(true)
             .subcommand_required(true)
             .arg_required_else_help(true)
+            .subcommand(Command::new(names::NITRO)
+                .about("Execute nitro script")
+                .trailing_var_arg(true)
+            )
             .subcommand(Command::new(names::CRAMS)
                 .about("Process list of CRAM files for Nephrotic syndrome KB.")
                 .arg(arg!(-i --input <FILE> "Input file")))
@@ -75,45 +85,57 @@ impl Config {
                 .arg(arg!(-t --target <FILE> "Target directory for file list files."))
                 .arg(arg!(-p --prefix <STRING> "Path prefix for file list files in list."))
                 .arg(arg!(-o --output <FILE> "Output file")));
-        let matches = app.try_get_matches()?;
-        if let Some(crams_matches) = matches.subcommand_matches(names::CRAMS) {
-            let input =
-                arg_as_string(crams_matches, "input", "input file")?;
-            Ok(Config::Crams(CramsConfig { input }))
-        } else if let
-        Some(fastqs_matches) = matches.subcommand_matches(names::FASTQS) {
-            let input =
-                arg_as_string(fastqs_matches, "input", "input file")?;
-            Ok(Config::Fastqs(FastqsConfig { input }))
-        } else if let
-        Some(fastqs_matches) = matches.subcommand_matches(names::FASTQ_BAMS) {
-            let input =
-                arg_as_string(fastqs_matches, "input", "input file")?;
-            Ok(Config::FastqBams(FastqBamsConfig { input }))
-        } else if let
-        Some(group_matches) = matches.subcommand_matches(names::GROUP) {
-            let input =
-                arg_as_string(group_matches, "input", "input file")?;
-            let key_col =
-                arg_as_string(group_matches, "key", "key")?;
-            let value_col =
-                arg_as_string(group_matches, "value", "value")?;
-            Ok(Config::Group(GroupConfig { input, key_col, value_col }))
-        } else if let
-        Some(ubams_matches) = matches.subcommand_matches(names::UBAMS) {
-            let input =
-                arg_as_string(ubams_matches, "input", "input file")?;
-            let target =
-                arg_as_string(ubams_matches, "target", "target")?;
-            let prefix =
-                arg_as_string(ubams_matches, "prefix", "prefix")?;
-            let output =
-                arg_as_string(ubams_matches, "output", "output file")?;
-            Ok(Config::Ubams(UbamsConfig { input, target, prefix, output }))
-        } else {
-            Err(Error::from(format!("Need to specify subcommand ({}, {}, {}, {} or {})",
-                                    names::CRAMS, names::FASTQS, names::FASTQ_BAMS, names::GROUP,
-                                    names::UBAMS)))
+        match app.try_get_matches()?.subcommand() {
+            Some((names::NITRO, nitro_matches)) => {
+                todo!()
+            }
+            Some((names::CRAMS, crams_matches)) => {
+                let input =
+                    arg_as_string(crams_matches, "input", "input file")?;
+                Ok(Config::Crams(CramsConfig { input }))
+            }
+            Some((names::FASTQS, fastqs_matches)) => {
+                let input =
+                    arg_as_string(fastqs_matches, "input", "input file")?;
+                Ok(Config::Fastqs(FastqsConfig { input }))
+            }
+            Some((names::FASTQ_BAMS, fastqs_matches)) => {
+                let input =
+                    arg_as_string(fastqs_matches, "input", "input file")?;
+                Ok(Config::FastqBams(FastqBamsConfig { input }))
+            }
+            Some((names::GROUP, group_matches)) => {
+                let input =
+                    arg_as_string(group_matches, "input", "input file")?;
+                let key_col =
+                    arg_as_string(group_matches, "key", "key")?;
+                let value_col =
+                    arg_as_string(group_matches, "value", "value")?;
+                Ok(Config::Group(GroupConfig { input, key_col, value_col }))
+            }
+            Some((names::UBAMS, ubams_matches)) => {
+                let input =
+                    arg_as_string(ubams_matches, "input", "input file")?;
+                let target =
+                    arg_as_string(ubams_matches, "target", "target")?;
+                let prefix =
+                    arg_as_string(ubams_matches, "prefix", "prefix")?;
+                let output =
+                    arg_as_string(ubams_matches, "output", "output file")?;
+                Ok(Config::Ubams(UbamsConfig { input, target, prefix, output }))
+            }
+            Some((subcommand, _)) => {
+                Err(Error::from(format!(
+                    "Unknown subcommand {}. Known subcommands are {}, {}, {}, {} and {})",
+                    subcommand, names::CRAMS, names::FASTQS, names::FASTQ_BAMS, names::GROUP,
+                    names::UBAMS
+                )))
+            }
+            None => {
+                Err(Error::from(format!("Need to specify subcommand ({}, {}, {}, {} or {})",
+                                        names::CRAMS, names::FASTQS, names::FASTQ_BAMS, names::GROUP,
+                                        names::UBAMS)))
+            }
         }
     }
 }
