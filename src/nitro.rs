@@ -1,3 +1,4 @@
+use fs_err::read_to_string;
 use crate::config::NitroConfig;
 use crate::Error;
 
@@ -6,5 +7,6 @@ pub(crate) fn nitro(config: NitroConfig) -> Result<(), Error> {
     for (key, values) in config.args {
         println!("{}: {}", key, values.join(" "))
     }
+    let script = read_to_string(&config.script_file)?;
     todo!()
 }
