@@ -1,8 +1,10 @@
 use std::collections::BTreeMap;
+use std::env::args;
 use clap::{command, Command, arg, ArgMatches, Arg};
 use crate::error::Error;
 
 pub(crate) enum Config {
+    Nitro(NitroConfig),
     Crams(CramsConfig),
     Fastqs(FastqsConfig),
     FastqBams(FastqBamsConfig),
@@ -11,7 +13,8 @@ pub(crate) enum Config {
 }
 
 pub(crate) struct NitroConfig {
-    args: BTreeMap<String, Vec<String>>,
+    pub(crate) script_file: String,
+    pub(crate) args: BTreeMap<String, Vec<String>>,
 }
 
 pub(crate) struct CramsConfig {
@@ -56,8 +59,52 @@ fn arg_as_string(arg_matches: &ArgMatches, key: &str, name: &str) -> Result<Stri
     Ok(string)
 }
 
+fn subcommand_is_nitro() -> bool {
+    if let Some(subcommand) = args().nth(1) {
+        subcommand == names::NITRO
+    } else {
+        false
+    }
+}
+
 impl Config {
     pub(crate) fn new() -> Result<Config, Error> {
+        if subcommand_is_nitro() {
+            Ok(Config::Nitro(Config::new_nitro()?))
+        } else {
+            Config::new_clap_parsed()
+        }
+    }
+    fn ensure_args_key(args: &mut BTreeMap<String, Vec<String>>, key: &str) {
+        if !args.contains_key(key) {
+            args.insert(String::from(key), Vec::new());
+        }
+    }
+    pub fn new_nitro() -> Result<NitroConfig, Error> {
+        let mut args_iter = args();
+        let script_file =
+            args_iter.nth(2).ok_or_else(|| {
+                Error::from("Missing script file argument.")
+            })?;
+        let mut args: BTreeMap<String, Vec<String>> = BTreeMap::new();
+        let mut key = String::new();
+        for arg in args_iter {
+            if let Some(key_new) = arg.strip_prefix("--") {
+                key = String::from(key_new);
+                Config::ensure_args_key(&mut args, &key);
+            } else if let Some(key_new) = arg.strip_prefix("-") {
+                key = String::from(key_new);
+                Config::ensure_args_key(&mut args, &key);
+            } else {
+                Config::ensure_args_key(&mut args, &key);
+                args.get_mut(&key).map(|key_args| {
+                    key_args.push(arg)
+                });
+            }
+        }
+        Ok(NitroConfig { script_file, args })
+    }
+    pub fn new_clap_parsed() -> Result<Config, Error> {
         let app = command!()
             .propagate_version(true)
             .subcommand_required(true)
@@ -88,15 +135,6 @@ impl Config {
                 .arg(arg!(-p --prefix <STRING> "Path prefix for file list files in list."))
                 .arg(arg!(-o --output <FILE> "Output file")));
         match app.try_get_matches()?.subcommand() {
-            Some((names::NITRO, nitro_matches)) => {
-                let foo =
-                    nitro_matches.try_get_many::<String>(names::VARARG)?
-                        .map(|values_ref| {
-                        values_ref.map(|value| { String::from(value) })
-                            .collect::<Vec<String>>()
-                    });
-                todo!()
-            }
             Some((names::CRAMS, crams_matches)) => {
                 let input =
                     arg_as_string(crams_matches, "input", "input file")?;

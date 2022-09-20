@@ -10,10 +10,14 @@ mod fastq_bams;
 mod group;
 mod col_names;
 mod ubams;
+mod nitro;
 
 pub fn run() -> Result<(), Error> {
     let config = Config::new()?;
     match config {
+        Config::Nitro(nitro_config) => {
+            nitro::nitro(nitro_config)?
+        }
         Config::Crams(cram_list_config) => {
             crams::process_cram_list(cram_list_config)?
         }
