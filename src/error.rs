@@ -1,12 +1,14 @@
 use std::fmt::{Display, Formatter};
 use std::io;
 use std::num::ParseIntError;
+use clap::parser::MatchesError;
 
 pub enum Error {
     Tsv(TsvError),
     Clap(clap::Error),
     Io(io::Error),
     ParseInt(ParseIntError),
+    Matches(MatchesError),
 }
 
 pub struct TsvError {
@@ -41,6 +43,10 @@ impl From<ParseIntError> for Error {
     fn from(parse_int_error: ParseIntError) -> Self { Error::ParseInt(parse_int_error) }
 }
 
+impl From<MatchesError> for Error {
+    fn from(matches_error: MatchesError) -> Self { Error::Matches(matches_error) }
+}
+
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -48,6 +54,7 @@ impl Display for Error {
             Error::Clap(clap_error) => { writeln!(f, "{}", clap_error) }
             Error::Io(io_error) => { writeln!(f, "{}", io_error) }
             Error::ParseInt(parse_int_error) => { writeln!(f, "{}", parse_int_error) }
+            Error::Matches(matches_error) => { writeln!(f, "{}", matches_error) }
         }
     }
 }

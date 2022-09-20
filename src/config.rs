@@ -1,5 +1,5 @@
 use std::collections::BTreeMap;
-use clap::{command, Command, arg, ArgMatches};
+use clap::{command, Command, arg, ArgMatches, Arg};
 use crate::error::Error;
 
 pub(crate) enum Config {
@@ -46,6 +46,7 @@ mod names {
     pub(crate) const FASTQ_BAMS: &str = "fastq-bams";
     pub(crate) const GROUP: &str = "group";
     pub(crate) const UBAMS: &str = "ubams";
+    pub(crate) const VARARG: &str = "vararg";
 }
 
 fn arg_as_string(arg_matches: &ArgMatches, key: &str, name: &str) -> Result<String, Error> {
@@ -64,6 +65,7 @@ impl Config {
             .subcommand(Command::new(names::NITRO)
                 .about("Execute nitro script")
                 .trailing_var_arg(true)
+                .arg(Arg::new(names::VARARG))
             )
             .subcommand(Command::new(names::CRAMS)
                 .about("Process list of CRAM files for Nephrotic syndrome KB.")
@@ -87,6 +89,12 @@ impl Config {
                 .arg(arg!(-o --output <FILE> "Output file")));
         match app.try_get_matches()?.subcommand() {
             Some((names::NITRO, nitro_matches)) => {
+                let foo =
+                    nitro_matches.try_get_many::<String>(names::VARARG)?
+                        .map(|values_ref| {
+                        values_ref.map(|value| { String::from(value) })
+                            .collect::<Vec<String>>()
+                    });
                 todo!()
             }
             Some((names::CRAMS, crams_matches)) => {
