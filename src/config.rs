@@ -1,7 +1,7 @@
-use std::collections::BTreeMap;
 use std::env::args;
 use clap::{command, Command, arg, ArgMatches, Arg};
 use crate::error::Error;
+use crate::nitro::env::Env;
 
 pub(crate) enum Config {
     Nitro(NitroConfig),
@@ -14,7 +14,7 @@ pub(crate) enum Config {
 
 pub(crate) struct NitroConfig {
     pub(crate) script_file: String,
-    pub(crate) args: BTreeMap<String, Vec<String>>,
+    pub(crate) env: Env,
 }
 
 pub(crate) struct CramsConfig {
@@ -75,34 +75,14 @@ impl Config {
             Config::new_clap_parsed()
         }
     }
-    fn ensure_args_key(args: &mut BTreeMap<String, Vec<String>>, key: &str) {
-        if !args.contains_key(key) {
-            args.insert(String::from(key), Vec::new());
-        }
-    }
     pub fn new_nitro() -> Result<NitroConfig, Error> {
-        let mut args_iter = args();
+        let mut args = args();
         let script_file =
-            args_iter.nth(2).ok_or_else(|| {
+            args.nth(2).ok_or_else(|| {
                 Error::from("Missing script file argument.")
             })?;
-        let mut args: BTreeMap<String, Vec<String>> = BTreeMap::new();
-        let mut key = String::new();
-        for arg in args_iter {
-            if let Some(key_new) = arg.strip_prefix("--") {
-                key = String::from(key_new);
-                Config::ensure_args_key(&mut args, &key);
-            } else if let Some(key_new) = arg.strip_prefix("-") {
-                key = String::from(key_new);
-                Config::ensure_args_key(&mut args, &key);
-            } else {
-                Config::ensure_args_key(&mut args, &key);
-                args.get_mut(&key).map(|key_args| {
-                    key_args.push(arg)
-                });
-            }
-        }
-        Ok(NitroConfig { script_file, args })
+        let env = Env::new();
+        Ok(NitroConfig { script_file, env })
     }
     pub fn new_clap_parsed() -> Result<Config, Error> {
         let app = command!()
