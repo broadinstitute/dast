@@ -98,7 +98,7 @@ impl FunImpl for MungeForMetastaar {
             if let Some(number) = numbers.next() {
                 out_line.push_str(&number.to_string());
                 for number in numbers {
-                    out_line.push_str(",");
+                    out_line.push(',');
                     out_line.push_str(&number.to_string());
                 }
             }

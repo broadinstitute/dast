@@ -1,7 +1,7 @@
 [package]
 name = "tsv"
 description = "TSV utilities"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Oliver Ruebenacker <oliverr@broadinstitute.org>"]
 edition = "2021"
 readme = "README.md"
@@ -13,4 +13,4 @@ license = "BSD-3-Clause"
 [dependencies]
 fs-err = "2.8.1"
 clap = { version = "3.2.22", features = ["cargo"] }
-jati = { git = "https://github.com/broadinstitute/jati" }
+jati = { git = "https://github.com/broadinstitute/jati", rev = "68de8a2f" }
