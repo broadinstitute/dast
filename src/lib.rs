@@ -11,6 +11,7 @@ mod group;
 mod col_names;
 mod ubams;
 mod nitro;
+mod data;
 
 pub fn run() -> Result<(), Error> {
     let config = Config::new()?;

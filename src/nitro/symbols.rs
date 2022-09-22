@@ -7,13 +7,13 @@ use crate::nitro::fun::Fun;
 use crate::nitro::var::Var;
 
 pub(crate) struct Symbols {
-    tsv_to_metastaar: Fun
+    munge_for_metastaar: Fun
 }
 
 impl Symbols {
     pub(crate) fn new() -> Symbols {
-        let tsv_to_metastaar = fun::builtin::tsv_to_metastaar::TsvToMetastaar::new_fun();
-        Symbols { tsv_to_metastaar }
+        let munge_for_metastaar = fun::builtin::munge_for_metastaar::MungeForMetastaar::new_fun();
+        Symbols { munge_for_metastaar }
     }
 }
 
@@ -23,15 +23,15 @@ impl JatiSymbols<Var, Fun> for Symbols {
     }
 
     fn get_fun(&mut self, name: &str, args: Vec<Type>) -> Result<Fun, JatiError> {
-        let tsv_to_metastaar_name = fun::builtin::tsv_to_metastaar::NAME;
-        if name == tsv_to_metastaar_name {
+        let munge_for_metastaar_name = fun::builtin::munge_for_metastaar::NAME;
+        if name == munge_for_metastaar_name {
             if args.is_empty() {
-                Ok(self.tsv_to_metastaar.clone())
+                Ok(self.munge_for_metastaar.clone())
             } else {
-                Err(wrong_number_of_args(tsv_to_metastaar_name, args.len(), 0))
+                Err(wrong_number_of_args(munge_for_metastaar_name, args.len(), 0))
             }
         } else {
-            Err(no_such_fun(fun::builtin::tsv_to_metastaar::NAME))
+            Err(no_such_fun(name))
         }
     }
 }

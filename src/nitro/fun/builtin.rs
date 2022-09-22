@@ -1,2 +1,2 @@
-pub(crate) mod tsv_to_metastaar;
+pub(crate) mod munge_for_metastaar;
 
