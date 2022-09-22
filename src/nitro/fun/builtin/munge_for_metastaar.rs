@@ -40,6 +40,36 @@ fn map_header(header_raw: String) -> String {
     }
 }
 
+fn warn_value(value: &str) {
+    eprintln!("Problematic data value '{}'.", value)
+}
+
+fn convert_to_number(value: &str) -> f64 {
+    match value.parse::<f64>() {
+        Ok(number) => { number }
+        Err(_) => {
+            let value = value.to_lowercase();
+            match value.as_str() {
+                "" => { warn_value(&value); 0.0 }
+                "do not know" => { warn_value(&value); 0.0 }
+                "prefer not to answer" => { warn_value(&value); 0.0 }
+                "no" => { 0.0 }
+                "yes" => { 1.0 }
+                "female" => { 0.0 }
+                "male" => { 1.0 }
+                _ => {
+                    if value.starts_with("yes ") {
+                        0.1
+                    } else {
+                        warn_value(&value);
+                        0.0
+                    }
+                }
+            }
+        }
+    }
+}
+
 impl FunImpl for MungeForMetastaar {
     fn call(&self, args: Vec<Value>, env: &Env) -> Result<Value, Error> {
         if !args.is_empty() {
@@ -60,7 +90,20 @@ impl FunImpl for MungeForMetastaar {
             println!("{}", header)
         }
         writeln!(writer, "{}", headers.join(","))?;
-        println!("Yo! At least got this far!");
-        todo!()
+        for line in lines {
+            let values = csv::parse_line(&line?)?;
+            let mut numbers =
+                values.iter().map(|value| { convert_to_number(value) });
+            let mut out_line = String::new();
+            if let Some(number) = numbers.next() {
+                out_line.push_str(&number.to_string());
+                for number in numbers {
+                    out_line.push_str(",");
+                    out_line.push_str(&number.to_string());
+                }
+            }
+            writeln!(writer, "{}", out_line)?;
+        }
+        Ok(Value::Unit)
     }
 }

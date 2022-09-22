@@ -19,6 +19,9 @@ pub(crate) fn parse_line(line: &str) -> Result<Vec<String>, Error> {
                     '"' => {
                         state = ParseState::QuotedValue;
                     }
+                    ',' => {
+                        push_value(&mut values, &mut value, &mut state);
+                    }
                     _ => {
                         state = ParseState::UnquotedValue;
                         value.push(char);
