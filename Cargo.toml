@@ -1,11 +1,11 @@
 [package]
-name = "tsv"
-description = "TSV utilities"
-version = "0.0.2"
+name = "dast"
+description = "Data stream transformer (DAST)"
+version = "0.0.3"
 authors = ["Oliver Ruebenacker <oliverr@broadinstitute.org>"]
 edition = "2021"
 readme = "README.md"
-repository = "https://github.com/broadinstitute/tsv"
+repository = "https://github.com/broadinstitute/dast"
 license = "BSD-3-Clause"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
