@@ -5,7 +5,7 @@ pub(crate) mod env;
 mod var;
 mod fun;
 
-use std::io::{stdin, Stdin};
+use std::io::{stdin, Stdin, stdout, Write};
 use fs_err::read_to_string;
 use jati::parse::parsers::id::RustIdParser;
 use jati::parse::parsers::script::ScriptParser;
@@ -62,8 +62,10 @@ struct Evaluation {
 fn read_and_evaluate_line(symbols: &mut Symbols, runtime: &mut Runtime, stdin: &mut Stdin)
     -> Result<Evaluation, Error> {
     print!("DAST> ");
+    stdout().flush()?;
     let mut input = String::new();
     stdin.read_line(&mut input)?;
+    println!("{}", input);
     let quit = input.trim() == "quit()";
     let raw_tree = parse_string(parser(), &input)?;
     let typed_tree = raw_tree.into_typed(symbols)?;
