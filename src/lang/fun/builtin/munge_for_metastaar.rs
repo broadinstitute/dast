@@ -4,9 +4,9 @@ use std::rc::Rc;
 use jati::trees::types::Type;
 use crate::data::csv;
 use crate::Error;
-use crate::nitro::env::Env;
-use crate::nitro::fun::{Fun, FunImpl};
-use crate::nitro::value::Value;
+use crate::lang::env::Env;
+use crate::lang::fun::{Fun, FunImpl};
+use crate::lang::value::Value;
 use std::io::Write;
 
 pub(crate) struct MungeForMetastaar {}

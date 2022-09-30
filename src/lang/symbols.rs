@@ -2,9 +2,9 @@ use jati::trees::symbols::Symbols as JatiSymbols;
 use jati::trees::types::Type;
 use jati::trees::symbols::errors::{no_such_fun, wrong_number_of_args};
 use jati::error::Error as JatiError;
-use crate::nitro::fun;
-use crate::nitro::fun::Fun;
-use crate::nitro::var::Var;
+use crate::lang::fun;
+use crate::lang::fun::Fun;
+use crate::lang::var::Var;
 
 pub(crate) struct Symbols {
     munge_for_metastaar: Fun

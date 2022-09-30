@@ -1,10 +1,18 @@
 use std::env::args;
 use clap::{command, Command, arg, ArgMatches, Arg};
 use crate::error::Error;
-use crate::nitro::env::Env;
+use crate::lang::env::Env;
+
+pub(crate) enum Choice {
+    Script,
+    Eval,
+    Shell
+}
 
 pub(crate) enum Config {
-    Nitro(NitroConfig),
+    Eval(EvalConfig),
+    Script(ScriptConfig),
+    Shell(ShellConfig),
     Crams(CramsConfig),
     Fastqs(FastqsConfig),
     FastqBams(FastqBamsConfig),
@@ -12,8 +20,17 @@ pub(crate) enum Config {
     Ubams(UbamsConfig),
 }
 
-pub(crate) struct NitroConfig {
+pub(crate) struct ScriptConfig {
     pub(crate) script_file: String,
+    pub(crate) env: Env,
+}
+
+pub(crate) struct EvalConfig {
+    pub(crate) string: String,
+    pub(crate) env: Env,
+}
+
+pub(crate) struct ShellConfig {
     pub(crate) env: Env,
 }
 
@@ -43,7 +60,9 @@ pub(crate) struct UbamsConfig {
 }
 
 mod names {
-    pub(crate) const NITRO: &str = "nitro";
+    pub(crate) const SCRIPT: &str = "script";
+    pub(crate) const EVAL: &str = "eval";
+    pub(crate) const SHELL: &str = "shell";
     pub(crate) const CRAMS: &str = "crams";
     pub(crate) const FASTQS: &str = "fastqs";
     pub(crate) const FASTQ_BAMS: &str = "fastq-bams";
@@ -59,38 +78,73 @@ fn arg_as_string(arg_matches: &ArgMatches, key: &str, name: &str) -> Result<Stri
     Ok(string)
 }
 
-fn subcommand_is_nitro() -> bool {
+fn subcommand_to_dast_choice() -> Option<Choice> {
     if let Some(subcommand) = args().nth(1) {
-        subcommand == names::NITRO
+        match subcommand.as_str() {
+            names::SCRIPT => { Some(Choice::Script) }
+            names::EVAL => { Some(Choice::Eval) }
+            names::SHELL => { Some(Choice::Shell) }
+            _ => { None }
+         }
     } else {
-        false
+        None
     }
 }
 
 impl Config {
     pub(crate) fn new() -> Result<Config, Error> {
-        if subcommand_is_nitro() {
-            Ok(Config::Nitro(Config::new_nitro()?))
-        } else {
-            Config::new_clap_parsed()
+        match subcommand_to_dast_choice() {
+            Some(choice) => {
+                match choice {
+                    Choice::Script => { Ok(Config::Eval(Config::new_eval_config()?)) }
+                    Choice::Eval => { Ok(Config::Script(Config::new_script_config()?)) }
+                    Choice::Shell => { Ok(Config::Shell(Config::new_shell_config()?)) }
+                }
+            }
+            None => {
+                Config::new_clap_parsed()
+            }
         }
     }
-    pub fn new_nitro() -> Result<NitroConfig, Error> {
+    pub fn new_script_config() -> Result<ScriptConfig, Error> {
         let mut args = args();
         let script_file =
             args.nth(2).ok_or_else(|| {
                 Error::from("Missing script file argument.")
             })?;
         let env = Env::new();
-        Ok(NitroConfig { script_file, env })
+        Ok(ScriptConfig { script_file, env })
+    }
+    pub fn new_eval_config() -> Result<EvalConfig, Error> {
+        let mut args = args();
+        let string =
+            args.nth(2).ok_or_else(|| {
+                Error::from("Missing expression argument.")
+            })?;
+        let env = Env::new();
+        Ok(EvalConfig { string, env })
+    }
+    pub fn new_shell_config() -> Result<ShellConfig, Error> {
+        let env = Env::new();
+        Ok(ShellConfig { env })
     }
     pub fn new_clap_parsed() -> Result<Config, Error> {
         let app = command!()
             .propagate_version(true)
             .subcommand_required(true)
             .arg_required_else_help(true)
-            .subcommand(Command::new(names::NITRO)
-                .about("Execute nitro script")
+            .subcommand(Command::new(names::EVAL)
+                .about("Evaluate expression")
+                .trailing_var_arg(true)
+                .arg(Arg::new(names::VARARG))
+            )
+            .subcommand(Command::new(names::SCRIPT)
+                .about("Execute script")
+                .trailing_var_arg(true)
+                .arg(Arg::new(names::VARARG))
+            )
+            .subcommand(Command::new(names::SHELL)
+                .about("Run shell")
                 .trailing_var_arg(true)
                 .arg(Arg::new(names::VARARG))
             )

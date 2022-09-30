@@ -4,8 +4,8 @@ use std::rc::Rc;
 use jati::trees::types::Type;
 use jati::engine::fun::Fun as JatiFun;
 use crate::Error;
-use crate::nitro::env::Env;
-use crate::nitro::value::Value;
+use crate::lang::env::Env;
+use crate::lang::value::Value;
 
 #[derive(Clone)]
 pub(crate) struct Fun {

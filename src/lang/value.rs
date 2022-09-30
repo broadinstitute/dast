@@ -1,6 +1,6 @@
 use std::fmt::{Display, Formatter};
 
-pub(crate) enum Value {
+pub enum Value {
     Unit
 }
 

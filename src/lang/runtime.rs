@@ -1,10 +1,10 @@
 use jati::trees::typed::call::Call;
 use jati::trees::typed::tree::Tree;
 use crate::Error;
-use crate::nitro::env::Env;
-use crate::nitro::fun::Fun;
-use crate::nitro::value::Value;
-use crate::nitro::var::Var;
+use crate::lang::env::Env;
+use crate::lang::fun::Fun;
+use crate::lang::value::Value;
+use crate::lang::var::Var;
 
 pub(crate) struct Runtime {
     env: Env
