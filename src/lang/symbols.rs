@@ -1,37 +1,36 @@
 use jati::trees::symbols::Symbols as JatiSymbols;
 use jati::trees::types::Type;
-use jati::trees::symbols::errors::{no_such_fun, wrong_number_of_args};
-use jati::error::Error as JatiError;
-use crate::lang::fun;
+use jati::trees::symbols::SymbolError;
 use crate::lang::fun::Fun;
 use crate::lang::var::Var;
+use crate::lang::fun::builtin;
 
 pub(crate) struct Symbols {
-    munge_for_metastaar: Fun
+    munge_for_metastaar: Fun,
 }
 
 impl Symbols {
     pub(crate) fn new() -> Symbols {
-        let munge_for_metastaar = fun::builtin::munge_for_metastaar::MungeForMetastaar::new_fun();
+        let munge_for_metastaar = builtin::munge_for_metastaar::MungeForMetastaar::new_fun();
         Symbols { munge_for_metastaar }
     }
 }
 
 impl JatiSymbols<Var, Fun> for Symbols {
-    fn get_var(&mut self, _name: &str) -> Result<Var, JatiError> {
+    fn get_var(&mut self, _name: &str) -> Result<Var, SymbolError> {
         todo!()
     }
 
-    fn get_fun(&mut self, name: &str, args: Vec<Type>) -> Result<Fun, JatiError> {
-        let munge_for_metastaar_name = fun::builtin::munge_for_metastaar::NAME;
+    fn get_fun(&mut self, name: &str, args: Vec<Type>) -> Result<Fun, SymbolError> {
+        let munge_for_metastaar_name = builtin::munge_for_metastaar::NAME;
         if name == munge_for_metastaar_name {
-            if args.is_empty() {
-                Ok(self.munge_for_metastaar.clone())
-            } else {
-                Err(wrong_number_of_args(munge_for_metastaar_name, args.len(), 0))
+            let fun = self.munge_for_metastaar.clone();
+            match fun.fun_impl().check_arg_types(&args) {
+                Ok(_) => { Ok(fun) }
+                Err(args_failure) => { Err(SymbolError::args_issue(name, args_failure)) }
             }
         } else {
-            Err(no_such_fun(name))
+            Err(SymbolError::no_such_fun(name))
         }
     }
 }

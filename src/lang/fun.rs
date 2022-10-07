@@ -3,6 +3,7 @@ pub(crate) mod builtin;
 use std::rc::Rc;
 use jati::trees::types::Type;
 use jati::engine::fun::Fun as JatiFun;
+use jati::trees::symbols::ArgsFailure;
 use crate::Error;
 use crate::lang::env::Env;
 use crate::lang::value::Value;
@@ -18,6 +19,7 @@ impl Fun {
 }
 
 pub(crate) trait FunImpl {
+    fn check_arg_types(&self, arg_types: &[Type]) -> Result<(), ArgsFailure>;
     fn call(&self, args: Vec<Value>, env: &Env) -> Result<Value, Error>;
 }
 

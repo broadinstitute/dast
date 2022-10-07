@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader, BufWriter};
 use std::rc::Rc;
 use jati::trees::types::Type;
+use jati::trees::symbols::ArgsFailure;
 use crate::data::csv;
 use crate::Error;
 use crate::lang::env::Env;
@@ -71,6 +72,16 @@ fn convert_to_number(value: &str) -> f64 {
 }
 
 impl FunImpl for MungeForMetastaar {
+    fn check_arg_types(&self, arg_types: &[Type]) -> Result<(), ArgsFailure> {
+        if arg_types.is_empty() {
+            Ok(())
+        } else {
+            let actual = arg_types.len();
+            let expected: usize = 0;
+            Err(ArgsFailure::WrongNumber { actual, expected})
+        }
+    }
+
     fn call(&self, args: Vec<Value>, env: &Env) -> Result<Value, Error> {
         if !args.is_empty() {
             return Err(Error::from(format!("{} takes no parameters.", NAME)));
