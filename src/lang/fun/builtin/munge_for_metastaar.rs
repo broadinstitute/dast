@@ -16,9 +16,10 @@ pub(crate) const NAME: &str = "munge_for_metastaar";
 
 impl MungeForMetastaar {
     pub(crate) fn new_fun() -> Fun {
+        let name = String::from(NAME);
         let fun_impl = Rc::new(MungeForMetastaar {});
         let tpe = Type::Unit;
-        Fun { fun_impl, tpe }
+        Fun { name, fun_impl, tpe }
     }
 }
 

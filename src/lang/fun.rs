@@ -10,6 +10,7 @@ use crate::lang::value::Value;
 
 #[derive(Clone)]
 pub(crate) struct Fun {
+    pub(crate) name: String,
     fun_impl: Rc<dyn FunImpl>,
     tpe: Type,
 }
