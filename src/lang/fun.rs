@@ -1,29 +1,31 @@
 pub(crate) mod builtin;
+pub(crate) mod util;
 
 use std::rc::Rc;
 use jati::trees::types::Type;
-use jati::engine::fun::Fun as JatiFun;
+use jati::runtime::fun::Fun as JatiFun;
 use jati::trees::symbols::ArgsFailure;
 use crate::Error;
 use crate::lang::env::Env;
 use crate::lang::value::Value;
 
 #[derive(Clone)]
-pub(crate) struct Fun {
+pub(crate) struct FunRef {
     pub(crate) name: String,
-    fun_impl: Rc<dyn FunImpl>,
-    tpe: Type,
+    fun: Rc<dyn Fun>,
 }
 
-impl Fun {
-    pub(crate) fn fun_impl(&self) -> Rc<dyn FunImpl> { self.fun_impl.clone() }
+impl FunRef {
+    pub(crate) fn fun(&self) -> Rc<dyn Fun> { self.fun.clone() }
 }
 
-pub(crate) trait FunImpl {
+pub(crate) trait Fun {
+    fn into_fun(self, name: String) -> FunRef;
+    fn tpe(&self) -> Type;
     fn check_arg_types(&self, arg_types: &[Type]) -> Result<(), ArgsFailure>;
     fn call(&self, args: Vec<Value>, env: &Env) -> Result<Value, Error>;
 }
 
-impl JatiFun for Fun {
-    fn tpe(&self) -> Type { self.tpe }
+impl JatiFun for FunRef {
+    fn tpe(&self) -> Type { self.fun.tpe() }
 }

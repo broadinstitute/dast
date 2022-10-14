@@ -13,4 +13,4 @@ license = "BSD-3-Clause"
 [dependencies]
 fs-err = "2.8.1"
 clap = { version = "3.2.22", features = ["cargo"] }
-jati = { git = "https://github.com/broadinstitute/jati", rev = "505f7a6" }
+jati = { git = "https://github.com/broadinstitute/jati", rev = "a4fed24" }

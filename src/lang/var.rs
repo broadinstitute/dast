@@ -1,5 +1,5 @@
 use jati::trees::types::Type;
-use jati::engine::var::Var as JatiVar;
+use jati::runtime::var::Var as JatiVar;
 
 pub(crate) struct Var {
     tpe: Type,
