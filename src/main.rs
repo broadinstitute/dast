@@ -1,4 +1,4 @@
-use dast::run;
+use tups::run;
 
 fn main() {
   match run() {

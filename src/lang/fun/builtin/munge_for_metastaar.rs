@@ -9,14 +9,15 @@ use crate::lang::env::Env;
 use crate::lang::fun::{FunRef, Fun};
 use crate::lang::value::Value;
 use std::io::Write;
+use crate::lang::fun::builtin::Gen;
 use crate::lang::fun::util::check_n_args;
 
 pub(crate) struct MungeForMetastaar {}
 
 pub(crate) const NAME: &str = "munge_for_metastaar";
 
-impl MungeForMetastaar {
-    pub(crate) fn new() -> MungeForMetastaar { MungeForMetastaar {} }
+impl Gen for MungeForMetastaar {
+    fn new() -> MungeForMetastaar { MungeForMetastaar {} }
 }
 
 fn map_header(header_raw: String) -> String {
@@ -78,7 +79,7 @@ fn convert_to_number(value: &str) -> f64 {
 }
 
 impl Fun for MungeForMetastaar {
-    fn into_fun(self, name: String) -> FunRef {
+    fn into_fun_ref(self, name: String) -> FunRef {
         let fun = Rc::new(self);
         FunRef { name, fun }
     }

@@ -20,7 +20,7 @@ impl FunRef {
 }
 
 pub(crate) trait Fun {
-    fn into_fun(self, name: String) -> FunRef;
+    fn into_fun_ref(self, name: String) -> FunRef;
     fn tpe(&self) -> Type;
     fn check_arg_types(&self, arg_types: &[Type]) -> Result<(), ArgsFailure>;
     fn call(&self, args: Vec<Value>, env: &Env) -> Result<Value, Error>;
