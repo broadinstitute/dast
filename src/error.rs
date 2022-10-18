@@ -3,7 +3,9 @@ use std::io;
 use std::num::ParseIntError;
 use clap::parser::MatchesError;
 use jati::error::Error as JatiError;
+use crate::lang::runtime::RunError;
 
+#[derive(Debug)]
 pub enum Error {
     Tsv(TsvError),
     Jati(JatiError),
@@ -11,8 +13,10 @@ pub enum Error {
     Io(io::Error),
     ParseInt(ParseIntError),
     Matches(MatchesError),
+    Run(RunError),
 }
 
+#[derive(Debug)]
 pub struct TsvError {
     message: String,
 }
@@ -53,6 +57,10 @@ impl From<MatchesError> for Error {
     fn from(matches_error: MatchesError) -> Self { Error::Matches(matches_error) }
 }
 
+impl From<RunError> for Error {
+    fn from(run_error: RunError) -> Self { Error::Run(run_error) }
+}
+
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -62,7 +70,10 @@ impl Display for Error {
             Error::Io(io_error) => { writeln!(f, "{}", io_error) }
             Error::ParseInt(parse_int_error) => { writeln!(f, "{}", parse_int_error) }
             Error::Matches(matches_error) => { writeln!(f, "{}", matches_error) }
+            Error::Run(run_error) => { writeln!(f, "{}", run_error) }
         }
     }
 }
+
+impl std::error::Error for Error {}
 

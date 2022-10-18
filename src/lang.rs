@@ -1,5 +1,5 @@
 mod symbols;
-mod runtime;
+pub(crate) mod runtime;
 pub(crate) mod value;
 pub(crate) mod env;
 mod var;
@@ -14,7 +14,7 @@ use jati::parse_string;
 use crate::config::{EvalConfig, ScriptConfig, ShellConfig};
 use crate::Error;
 use crate::lang::env::Env;
-use crate::lang::runtime::Runtime;
+use crate::lang::runtime::{map_err_run, RunResult, Runtime};
 use crate::lang::symbols::Symbols;
 use crate::lang::value::Value;
 
@@ -39,38 +39,36 @@ pub(crate) fn run_shell(config: ShellConfig) -> Result<Value, Error> {
     let mut runtime = Runtime::new(env);
     let mut symbols = Symbols::new();
     let mut stdin = stdin();
-    loop {
-        match read_and_evaluate_line(&mut symbols, &mut runtime, &mut stdin) {
-            Ok(Evaluation { value, quit }) => {
-                println!("{}", value);
-                if quit {
-                    println!("Goodbye!");
-                    break;
-                }
-            }
+    let run_result = loop {
+        let run_result = read_and_evaluate_line(&mut symbols, &mut runtime, &mut stdin);
+        match &run_result {
+            Ok(value) => { println!("{}", value); }
             Err(error) => { println!("{}", error) }
         }
-    }
-    Ok(Value::Unit)
-}
-
-struct Evaluation {
-    value: Value,
-    quit: bool,
+        if runtime.exit_has_been_requested() {
+            break run_result
+        }
+    };
+    let value = run_result?;
+    Ok(value)
 }
 
 fn read_and_evaluate_line(symbols: &mut Symbols, runtime: &mut Runtime, stdin: &mut Stdin)
-    -> Result<Evaluation, Error> {
-    print!("DAST> ");
-    stdout().flush()?;
+    -> RunResult {
+    print!("Tups> ");
+    map_err_run(stdout().flush(), "STDOUT")?;
     let mut input = String::new();
-    stdin.read_line(&mut input)?;
+    map_err_run(stdin.read_line(&mut input), "STDIN")?;
     println!("{}", input);
-    let quit = input.trim() == "quit()";
-    let raw_tree = parse_string(parser(), &input)?;
-    let typed_tree = raw_tree.into_typed(symbols)?;
+    if input.trim() == "quit()" {
+        runtime.request_exit()
+    }
+    let raw_tree =
+        map_err_run(parse_string(parser(), &input), "Parsing input")?;
+    let typed_tree =
+        map_err_run(raw_tree.into_typed(symbols), "Typing input")?;
     let value = runtime.evaluate(&typed_tree)?;
-    Ok(Evaluation { value, quit })
+    Ok(value)
 }
 
 fn run_string(script: String, env: Env) -> Result<Value, Error> {
@@ -78,7 +76,7 @@ fn run_string(script: String, env: Env) -> Result<Value, Error> {
     let mut symbols = Symbols::new();
     let typed_tree = raw_tree.into_typed(&mut symbols)?;
     let mut runtime = Runtime::new(env);
-    let value = runtime.evaluate(&typed_tree)?;
+    let value = map_err_run(runtime.evaluate(&typed_tree), "Evaluating input")?;
     Ok(value)
 }
 

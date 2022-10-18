@@ -1,2 +1,2 @@
 # Tups
-Tuple stream transformer
+Tups, the tuple stream transformer.

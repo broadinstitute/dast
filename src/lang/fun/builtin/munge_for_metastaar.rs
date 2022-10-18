@@ -1,20 +1,17 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader, BufWriter};
-use std::rc::Rc;
 use jati::trees::types::Type;
 use jati::trees::symbols::ArgsFailure;
 use crate::data::csv;
-use crate::Error;
 use crate::lang::env::Env;
-use crate::lang::fun::{FunRef, Fun};
+use crate::lang::fun::Fun;
 use crate::lang::value::Value;
 use std::io::Write;
 use crate::lang::fun::builtin::Gen;
 use crate::lang::fun::util::check_n_args;
+use crate::lang::runtime::{map_err_run, RunError, RunResult};
 
 pub(crate) struct MungeForMetastaar {}
-
-pub(crate) const NAME: &str = "munge_for_metastaar";
 
 impl Gen for MungeForMetastaar {
     fn new() -> MungeForMetastaar { MungeForMetastaar {} }
@@ -79,35 +76,40 @@ fn convert_to_number(value: &str) -> f64 {
 }
 
 impl Fun for MungeForMetastaar {
-    fn into_fun_ref(self, name: String) -> FunRef {
-        let fun = Rc::new(self);
-        FunRef { name, fun }
-    }
     fn tpe(&self) -> Type { Type::Unit }
     fn check_arg_types(&self, arg_types: &[Type]) -> Result<(), ArgsFailure> {
         check_n_args(arg_types, 0)
     }
-    fn call(&self, args: Vec<Value>, env: &Env) -> Result<Value, Error> {
+    fn call(&self, args: Vec<Value>, env: &Env) -> RunResult {
         if !args.is_empty() {
-            return Err(Error::from(format!("{} takes no parameters.", NAME)));
+            return Err(RunError::from("Fun takes no arguments"));
         }
         let input_file_name = env.get_arg("i")?;
         let output_file_name = env.get_arg("o")?;
-        let reader = BufReader::new(File::open(input_file_name)?);
+        let reader =
+            BufReader::new(
+                map_err_run(File::open(input_file_name), input_file_name)?
+            );
         let mut lines = reader.lines();
         let header_line =
-            lines.next().ok_or_else(|| {
-                Error::from(format!("Input file {} is empty", input_file_name))
-            })??;
+            map_err_run(map_err_run(lines.next().ok_or_else(|| {
+                RunError::from("File is empty")
+            }), input_file_name)?, input_file_name)?;
         let headers: Vec<String> =
-            csv::parse_line(&header_line)?.into_iter().map(map_header).collect();
-        let mut writer = BufWriter::new(File::create(output_file_name)?);
+            map_err_run(csv::parse_line(&header_line), input_file_name)?
+                .into_iter().map(map_header).collect();
+        let mut writer =
+            BufWriter::new(
+                map_err_run(File::create(output_file_name), output_file_name)?
+            );
         for header in &headers {
             println!("{}", header)
         }
-        writeln!(writer, "{}", headers.join(","))?;
+        map_err_run(writeln!(writer, "{}", headers.join(",")), output_file_name)?;
         for line in lines {
-            let values = csv::parse_line(&line?)?;
+            let line = map_err_run(line, input_file_name)?;
+            let values =
+                map_err_run(csv::parse_line(&line), output_file_name)?;
             let mut numbers =
                 values.iter().map(|value| { convert_to_number(value) });
             let mut out_line = String::new();
@@ -118,7 +120,7 @@ impl Fun for MungeForMetastaar {
                     out_line.push_str(&number.to_string());
                 }
             }
-            writeln!(writer, "{}", out_line)?;
+            map_err_run(writeln!(writer, "{}", out_line), output_file_name)?;
         }
         Ok(Value::Unit)
     }
