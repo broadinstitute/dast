@@ -3,13 +3,12 @@ use std::io::{BufRead, BufReader, BufWriter};
 use jati::trees::types::Type;
 use jati::trees::symbols::ArgsFailure;
 use crate::data::csv;
-use crate::lang::env::Env;
 use crate::lang::fun::Fun;
 use crate::lang::value::Value;
 use std::io::Write;
 use crate::lang::fun::builtin::Gen;
 use crate::lang::fun::util::check_n_args;
-use crate::lang::runtime::{map_err_run, RunError, RunResult};
+use crate::lang::runtime::{map_err_run, RunError, RunResult, Runtime};
 
 pub(crate) struct MungeForMetastaar {}
 
@@ -80,10 +79,11 @@ impl Fun for MungeForMetastaar {
     fn check_arg_types(&self, arg_types: &[Type]) -> Result<(), ArgsFailure> {
         check_n_args(arg_types, 0)
     }
-    fn call(&self, args: Vec<Value>, env: &Env) -> RunResult {
+    fn call(&self, args: Vec<Value>, runtime: &mut Runtime) -> RunResult {
         if !args.is_empty() {
             return Err(RunError::from("Fun takes no arguments"));
         }
+        let env = runtime.env();
         let input_file_name = env.get_arg("i")?;
         let output_file_name = env.get_arg("o")?;
         let reader =

@@ -5,8 +5,7 @@ use std::rc::Rc;
 use jati::trees::types::Type;
 use jati::runtime::fun::Fun as JatiFun;
 use jati::trees::symbols::ArgsFailure;
-use crate::lang::env::Env;
-use crate::lang::runtime::RunResult;
+use crate::lang::runtime::{RunResult, Runtime};
 use crate::lang::value::Value;
 
 #[derive(Clone)]
@@ -26,7 +25,7 @@ pub(crate) trait Fun {
     }
     fn tpe(&self) -> Type;
     fn check_arg_types(&self, arg_types: &[Type]) -> Result<(), ArgsFailure>;
-    fn call(&self, args: Vec<Value>, env: &Env) -> RunResult;
+    fn call(&self, args: Vec<Value>, runtime: &mut Runtime) -> RunResult;
 }
 
 impl JatiFun for FunRef {

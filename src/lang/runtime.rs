@@ -8,7 +8,7 @@ use crate::lang::var::Var;
 
 pub(crate) struct Runtime {
     env: Env,
-    exit_has_been_requested: bool,
+    exit_result: Option<RunResult>,
 }
 
 #[derive(Debug)]
@@ -62,9 +62,10 @@ pub(crate) type RunResult = Result<Value, RunError>;
 
 impl Runtime {
     pub(crate) fn new(env: Env) -> Runtime {
-        let exit_has_been_requested = false;
-        Runtime { env, exit_has_been_requested }
+        let exit_result: Option<RunResult> = None;
+        Runtime { env, exit_result }
     }
+    pub(crate) fn env(&self) -> &Env { &self.env }
     pub(crate) fn evaluate(&mut self, tree: &Tree<Var, FunRef>) -> RunResult {
         match tree {
             Tree::Call(call) => { self.evaluate_call(call) }
@@ -72,15 +73,23 @@ impl Runtime {
             Tree::Lit(_) => { todo!() }
         }
     }
-    pub(crate) fn request_exit(&mut self) { self.exit_has_been_requested = true }
-    pub(crate) fn exit_has_been_requested(&self) -> bool { self.exit_has_been_requested }
+    pub(crate) fn request_exit(&mut self, exit_result: RunResult) {
+        self.exit_result = Some(exit_result)
+    }
+    pub(crate) fn exit_result_ref(&self) -> &Option<RunResult> { &self.exit_result }
+    pub(crate) fn take_exit_result(&mut self) -> RunResult {
+        match self.exit_result.take() {
+            None => { Ok(Value::Unit )}
+            Some(result) => { result }
+        }
+    }
     fn evaluate_call(&mut self, call: &Call<Var, FunRef>) -> RunResult {
         let mut arg_values: Vec<Value> = Vec::new();
         for arg in &call.args {
             let value = self.evaluate(arg)?;
             arg_values.push(value);
         }
-        call.fun.fun().call(arg_values, &self.env)
+        call.fun.fun().call(arg_values, self)
     }
 }
 

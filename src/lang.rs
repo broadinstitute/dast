@@ -39,17 +39,17 @@ pub(crate) fn run_shell(config: ShellConfig) -> Result<Value, Error> {
     let mut runtime = Runtime::new(env);
     let mut symbols = Symbols::new();
     let mut stdin = stdin();
-    let run_result = loop {
+    loop {
         let run_result = read_and_evaluate_line(&mut symbols, &mut runtime, &mut stdin);
         match &run_result {
             Ok(value) => { println!("{}", value); }
             Err(error) => { println!("{}", error) }
         }
-        if runtime.exit_has_been_requested() {
-            break run_result
+        if runtime.exit_result_ref().is_some() {
+            break
         }
     };
-    let value = run_result?;
+    let value = runtime.take_exit_result()?;
     Ok(value)
 }
 
@@ -61,7 +61,7 @@ fn read_and_evaluate_line(symbols: &mut Symbols, runtime: &mut Runtime, stdin: &
     map_err_run(stdin.read_line(&mut input), "STDIN")?;
     println!("{}", input);
     if input.trim() == "quit()" {
-        runtime.request_exit()
+        runtime.request_exit(Ok(Value::Unit))
     }
     let raw_tree =
         map_err_run(parse_string(parser(), &input), "Parsing input")?;
