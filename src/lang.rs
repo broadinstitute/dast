@@ -60,13 +60,10 @@ fn read_and_evaluate_line(symbols: &mut Symbols, runtime: &mut Runtime, stdin: &
     let mut input = String::new();
     map_err_run(stdin.read_line(&mut input), "STDIN")?;
     println!("{}", input);
-    if input.trim() == "quit()" {
-        runtime.request_exit(Ok(Value::Unit))
-    }
     let raw_tree =
-        map_err_run(parse_string(parser(), &input), "Parsing input")?;
+        map_err_run(parse_string(parser(), &input), "Parsing error")?;
     let typed_tree =
-        map_err_run(raw_tree.into_typed(symbols), "Typing input")?;
+        map_err_run(raw_tree.into_typed(symbols), "Typing error")?;
     let value = runtime.evaluate(&typed_tree)?;
     Ok(value)
 }
@@ -76,7 +73,7 @@ fn run_string(script: String, env: Env) -> Result<Value, Error> {
     let mut symbols = Symbols::new();
     let typed_tree = raw_tree.into_typed(&mut symbols)?;
     let mut runtime = Runtime::new(env);
-    let value = map_err_run(runtime.evaluate(&typed_tree), "Evaluating input")?;
+    let value = map_err_run(runtime.evaluate(&typed_tree), "Evaluation error")?;
     Ok(value)
 }
 

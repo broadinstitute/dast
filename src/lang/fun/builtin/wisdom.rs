@@ -9,10 +9,10 @@ use crate::lang::fun::util::check_n_args;
 use crate::lang::runtime::{RunResult, Runtime};
 use rand::seq::SliceRandom;
 
-pub(crate) struct Fortune {}
+pub(crate) struct Wisdom {}
 
-impl Gen for Fortune {
-    fn new() -> Fortune { Fortune {} }
+impl Gen for Wisdom {
+    fn new() -> Wisdom { Wisdom {} }
 }
 
 struct Quote {
@@ -24,7 +24,7 @@ impl Quote {
     const fn new(content: &'static str, author: &'static str) -> Quote { Quote { content, author } }
 }
 
-const QUOTES: [Quote; 8] = [
+const QUOTES: [Quote; 9] = [
     Quote::new("Life is what happens when you're busy making other plans.",
                "John Lennon"),
     Quote::new("The greatest glory in living lies not in never falling, but in rising every time we fall.",
@@ -45,6 +45,8 @@ const QUOTES: [Quote; 8] = [
     Quote::new("There are only two ways to live your life. One is as though nothing is a \
     miracle. The other is as though everything is a miracle.",
                "Albert Einstein"),
+    Quote::new("Love is the attempt to form a friendship inspired by beauty.",
+               "Marcus Tullius Cicero"),
 ];
 
 //
@@ -54,7 +56,7 @@ impl Display for Quote {
     }
 }
 
-impl Fun for Fortune {
+impl Fun for Wisdom {
     fn tpe(&self) -> Type { Type::String }
     fn check_arg_types(&self, arg_types: &[Type]) -> Result<(), ArgsFailure> {
         check_n_args(arg_types, 0)
