@@ -23,7 +23,7 @@ pub fn run() -> Result<Value, Error> {
             lang::run_shell(shell_config)
         }
         Config::Group(group_config) => {
-            group::group(group_config)?;
+            group::group_old(group_config)?;
             Ok(Value::Unit)
         }
     }
