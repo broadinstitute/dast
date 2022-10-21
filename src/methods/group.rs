@@ -1,15 +1,8 @@
-use crate::config::GroupConfig;
-use crate::error::Error;
 use fs_err::File;
 use std::io::{BufReader, BufRead};
 use crate::col_names::ColNames;
 use crate::lang::runtime::{map_err_run, RunError, RunResult};
 use crate::Value;
-
-pub(crate) fn group_old(config: GroupConfig) -> Result<(), Error> {
-    group(&config.input, &config.key_col, &config.value_col)?;
-    Ok(())
-}
 
 pub(crate) fn group(input: &str, key_col: &str, value_col: &str) -> RunResult {
     let file = map_err_run(File::open(input), input)?;

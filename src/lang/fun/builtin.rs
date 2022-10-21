@@ -7,6 +7,7 @@ use crate::lang::fun::builtin::quit::Quit;
 pub(crate) mod munge_for_metastaar;
 pub(crate) mod wisdom;
 pub(crate) mod quit;
+mod group;
 
 pub(crate) trait Gen where Self: Fun {
     fn new() -> Self;

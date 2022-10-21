@@ -22,9 +22,5 @@ pub fn run() -> Result<Value, Error> {
         Config::Shell(shell_config) => {
             lang::run_shell(shell_config)
         }
-        Config::Group(group_config) => {
-            group::group_old(group_config)?;
-            Ok(Value::Unit)
-        }
     }
 }
