@@ -2,7 +2,7 @@ use crate::config::FastqsConfig;
 use crate::error::Error;
 use fs_err::File;
 use std::io::{BufReader, BufRead};
-use crate::nephrotic;
+use crate::methods::legacy::nephrotic;
 use std::collections::HashMap;
 
 const HEADER_FOR_TERRA: &str =

@@ -13,7 +13,6 @@ pub(crate) enum Config {
     Eval(EvalConfig),
     Script(ScriptConfig),
     Shell(ShellConfig),
-    Crams(CramsConfig),
     Fastqs(FastqsConfig),
     FastqBams(FastqBamsConfig),
     Group(GroupConfig),
@@ -32,10 +31,6 @@ pub(crate) struct EvalConfig {
 
 pub(crate) struct ShellConfig {
     pub(crate) env: Env,
-}
-
-pub(crate) struct CramsConfig {
-    pub(crate) input: String,
 }
 
 pub(crate) struct FastqsConfig {
@@ -63,7 +58,6 @@ mod names {
     pub(crate) const SCRIPT: &str = "script";
     pub(crate) const EVAL: &str = "eval";
     pub(crate) const SHELL: &str = "shell";
-    pub(crate) const CRAMS: &str = "crams";
     pub(crate) const FASTQS: &str = "fastqs";
     pub(crate) const FASTQ_BAMS: &str = "fastq-bams";
     pub(crate) const GROUP: &str = "group";
@@ -78,7 +72,7 @@ fn arg_as_string(arg_matches: &ArgMatches, key: &str, name: &str) -> Result<Stri
     Ok(string)
 }
 
-fn subcommand_to_dast_choice() -> Option<Choice> {
+fn subcommand_to_tups_choice() -> Option<Choice> {
     if let Some(subcommand) = args().nth(1) {
         match subcommand.as_str() {
             names::SCRIPT => { Some(Choice::Script) }
@@ -93,7 +87,7 @@ fn subcommand_to_dast_choice() -> Option<Choice> {
 
 impl Config {
     pub(crate) fn new() -> Result<Config, Error> {
-        match subcommand_to_dast_choice() {
+        match subcommand_to_tups_choice() {
             Some(choice) => {
                 match choice {
                     Choice::Script => { Ok(Config::Eval(Config::new_eval_config()?)) }
@@ -148,9 +142,6 @@ impl Config {
                 .trailing_var_arg(true)
                 .arg(Arg::new(names::VARARG))
             )
-            .subcommand(Command::new(names::CRAMS)
-                .about("Process list of CRAM files for Nephrotic syndrome KB.")
-                .arg(arg!(-i --input <FILE> "Input file")))
             .subcommand(Command::new(names::FASTQS)
                 .about("Process list of FASTQ files for Nephrotic syndrome KB.")
                 .arg(arg!(-i --input <FILE> "Input file")))
@@ -169,11 +160,6 @@ impl Config {
                 .arg(arg!(-p --prefix <STRING> "Path prefix for file list files in list."))
                 .arg(arg!(-o --output <FILE> "Output file")));
         match app.try_get_matches()?.subcommand() {
-            Some((names::CRAMS, crams_matches)) => {
-                let input =
-                    arg_as_string(crams_matches, "input", "input file")?;
-                Ok(Config::Crams(CramsConfig { input }))
-            }
             Some((names::FASTQS, fastqs_matches)) => {
                 let input =
                     arg_as_string(fastqs_matches, "input", "input file")?;
@@ -206,14 +192,13 @@ impl Config {
             }
             Some((subcommand, _)) => {
                 Err(Error::from(format!(
-                    "Unknown subcommand {}. Known subcommands are {}, {}, {}, {} and {})",
-                    subcommand, names::CRAMS, names::FASTQS, names::FASTQ_BAMS, names::GROUP,
-                    names::UBAMS
+                    "Unknown subcommand {}. Known subcommands are {}, {}, {} and {})",
+                    subcommand, names::FASTQS, names::FASTQ_BAMS, names::GROUP, names::UBAMS
                 )))
             }
             None => {
-                Err(Error::from(format!("Need to specify subcommand ({}, {}, {}, {} or {})",
-                                        names::CRAMS, names::FASTQS, names::FASTQ_BAMS, names::GROUP,
+                Err(Error::from(format!("Need to specify subcommand ({}, {}, {} or {})",
+                                        names::FASTQS, names::FASTQ_BAMS, names::GROUP,
                                         names::UBAMS)))
             }
         }

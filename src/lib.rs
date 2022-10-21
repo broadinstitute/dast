@@ -1,18 +1,15 @@
+use methods::group;
+use methods::legacy::{fastq_bams, fastqs, ubams};
 use crate::config::Config;
 use crate::error::Error;
 use crate::lang::value::Value;
 
 mod config;
 mod error;
-mod crams;
-mod fastqs;
-mod nephrotic;
-mod fastq_bams;
-mod group;
 mod col_names;
-mod ubams;
 mod lang;
 mod data;
+mod methods;
 
 pub fn run() -> Result<Value, Error> {
     let config = Config::new()?;
@@ -25,10 +22,6 @@ pub fn run() -> Result<Value, Error> {
         }
         Config::Shell(shell_config) => {
             lang::run_shell(shell_config)
-        }
-        Config::Crams(cram_list_config) => {
-            crams::process_cram_list(cram_list_config)?;
-            Ok(Value::Unit)
         }
         Config::Fastqs(fastq_list_config) => {
             fastqs::process_fastq_list(fastq_list_config)?;

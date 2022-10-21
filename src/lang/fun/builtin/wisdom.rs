@@ -24,7 +24,7 @@ impl Quote {
     const fn new(content: &'static str, author: &'static str) -> Quote { Quote { content, author } }
 }
 
-const QUOTES: [Quote; 9] = [
+const QUOTES: [Quote; 10] = [
     Quote::new("Life is what happens when you're busy making other plans.",
                "John Lennon"),
     Quote::new("The greatest glory in living lies not in never falling, but in rising every time we fall.",
@@ -47,6 +47,8 @@ const QUOTES: [Quote; 9] = [
                "Albert Einstein"),
     Quote::new("Love is the attempt to form a friendship inspired by beauty.",
                "Marcus Tullius Cicero"),
+    Quote::new("I don't believe in collective guilt, but I do believe in collective responsibility.",
+               "Audrey Hepburn"),
 ];
 
 //
