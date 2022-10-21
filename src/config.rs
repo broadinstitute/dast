@@ -13,10 +13,7 @@ pub(crate) enum Config {
     Eval(EvalConfig),
     Script(ScriptConfig),
     Shell(ShellConfig),
-    Fastqs(FastqsConfig),
-    FastqBams(FastqBamsConfig),
     Group(GroupConfig),
-    Ubams(UbamsConfig),
 }
 
 pub(crate) struct ScriptConfig {
@@ -33,35 +30,17 @@ pub(crate) struct ShellConfig {
     pub(crate) env: Env,
 }
 
-pub(crate) struct FastqsConfig {
-    pub(crate) input: String,
-}
-
-pub(crate) struct FastqBamsConfig {
-    pub(crate) input: String,
-}
-
 pub(crate) struct GroupConfig {
     pub(crate) input: String,
     pub(crate) key_col: String,
     pub(crate) value_col: String,
 }
 
-pub(crate) struct UbamsConfig {
-    pub(crate) input: String,
-    pub(crate) target: String,
-    pub(crate) prefix: String,
-    pub(crate) output: String,
-}
-
 mod names {
     pub(crate) const SCRIPT: &str = "script";
     pub(crate) const EVAL: &str = "eval";
     pub(crate) const SHELL: &str = "shell";
-    pub(crate) const FASTQS: &str = "fastqs";
-    pub(crate) const FASTQ_BAMS: &str = "fastq-bams";
     pub(crate) const GROUP: &str = "group";
-    pub(crate) const UBAMS: &str = "ubams";
     pub(crate) const VARARG: &str = "vararg";
 }
 
@@ -142,34 +121,12 @@ impl Config {
                 .trailing_var_arg(true)
                 .arg(Arg::new(names::VARARG))
             )
-            .subcommand(Command::new(names::FASTQS)
-                .about("Process list of FASTQ files for Nephrotic syndrome KB.")
-                .arg(arg!(-i --input <FILE> "Input file")))
-            .subcommand(Command::new(names::FASTQ_BAMS)
-                .about("Process list of FASTQ-derived BAM files for Nephrotic syndrome KB.")
-                .arg(arg!(-i --input <FILE> "Input file")))
             .subcommand(Command::new(names::GROUP)
                 .about("Group records of same key, collecting values.")
                 .arg(arg!(-i --input <FILE> "Input file"))
                 .arg(arg!(-k --key <FILE> "Key column"))
-                .arg(arg!(-v --value <FILE> "Value column")))
-            .subcommand(Command::new(names::UBAMS)
-                .about("Create lists of unmapped BAM files.")
-                .arg(arg!(-i --input <FILE> "Input file"))
-                .arg(arg!(-t --target <FILE> "Target directory for file list files."))
-                .arg(arg!(-p --prefix <STRING> "Path prefix for file list files in list."))
-                .arg(arg!(-o --output <FILE> "Output file")));
+                .arg(arg!(-v --value <FILE> "Value column")));
         match app.try_get_matches()?.subcommand() {
-            Some((names::FASTQS, fastqs_matches)) => {
-                let input =
-                    arg_as_string(fastqs_matches, "input", "input file")?;
-                Ok(Config::Fastqs(FastqsConfig { input }))
-            }
-            Some((names::FASTQ_BAMS, fastqs_matches)) => {
-                let input =
-                    arg_as_string(fastqs_matches, "input", "input file")?;
-                Ok(Config::FastqBams(FastqBamsConfig { input }))
-            }
             Some((names::GROUP, group_matches)) => {
                 let input =
                     arg_as_string(group_matches, "input", "input file")?;
@@ -179,27 +136,13 @@ impl Config {
                     arg_as_string(group_matches, "value", "value")?;
                 Ok(Config::Group(GroupConfig { input, key_col, value_col }))
             }
-            Some((names::UBAMS, ubams_matches)) => {
-                let input =
-                    arg_as_string(ubams_matches, "input", "input file")?;
-                let target =
-                    arg_as_string(ubams_matches, "target", "target")?;
-                let prefix =
-                    arg_as_string(ubams_matches, "prefix", "prefix")?;
-                let output =
-                    arg_as_string(ubams_matches, "output", "output file")?;
-                Ok(Config::Ubams(UbamsConfig { input, target, prefix, output }))
-            }
             Some((subcommand, _)) => {
                 Err(Error::from(format!(
-                    "Unknown subcommand {}. Known subcommands are {}, {}, {} and {})",
-                    subcommand, names::FASTQS, names::FASTQ_BAMS, names::GROUP, names::UBAMS
+                    "Unknown subcommand {}. Known subcommands is {})", subcommand, names::GROUP
                 )))
             }
             None => {
-                Err(Error::from(format!("Need to specify subcommand ({}, {}, {} or {})",
-                                        names::FASTQS, names::FASTQ_BAMS, names::GROUP,
-                                        names::UBAMS)))
+                Err(Error::from(format!("Need to specify subcommand ({})", names::GROUP)))
             }
         }
     }
