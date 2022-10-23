@@ -5,7 +5,7 @@ use std::rc::Rc;
 use jati::trees::types::Type;
 use jati::runtime::fun::Fun as JatiFun;
 use jati::trees::symbols::ArgsFailure;
-use crate::lang::runtime::{RunResult, Runtime};
+use crate::lang::runtime::Runtime;
 use crate::lang::value::Value;
 
 #[derive(Clone)]

@@ -6,7 +6,7 @@ use crate::lang::fun::builtin::Gen;
 use crate::lang::fun::Fun;
 use crate::Value;
 use crate::lang::fun::util::check_n_args;
-use crate::lang::runtime::{RunResult, Runtime};
+use crate::lang::runtime::Runtime;
 use rand::seq::SliceRandom;
 
 pub(crate) struct Wisdom {}

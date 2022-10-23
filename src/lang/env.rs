@@ -1,5 +1,4 @@
 use std::collections::BTreeMap;
-use crate::lang::runtime::RunError;
 
 pub(crate) struct Env {
     pub(crate) args: BTreeMap<String, Vec<String>>

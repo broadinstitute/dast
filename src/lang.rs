@@ -12,13 +12,12 @@ use jati::parse::parsers::script::ScriptParser;
 use jati::parse::parsers::white::DefaultWhiteSpaceParser;
 use jati::parse_string;
 use crate::config::{EvalConfig, ScriptConfig, ShellConfig};
-use crate::Error;
 use crate::lang::env::Env;
-use crate::lang::runtime::{map_err_run, RunResult, Runtime};
+use crate::lang::runtime::Runtime;
 use crate::lang::symbols::Symbols;
 use crate::lang::value::Value;
 
-pub(crate) fn run_script(config: ScriptConfig) -> Result<Value, Error> {
+pub(crate) fn run_script(config: ScriptConfig) -> Result<Value, ErrorOld> {
     let ScriptConfig { script_file, env } = config;
     println!("script file: {}", script_file);
     for (key, values) in &env.args {
@@ -29,12 +28,12 @@ pub(crate) fn run_script(config: ScriptConfig) -> Result<Value, Error> {
     run_string(script, env)
 }
 
-pub(crate) fn evaluate_expression(config: EvalConfig) -> Result<Value, Error> {
+pub(crate) fn evaluate_expression(config: EvalConfig) -> Result<Value, ErrorOld> {
     let EvalConfig { string, env } = config;
     run_string(string, env)
 }
 
-pub(crate) fn run_shell(config: ShellConfig) -> Result<Value, Error> {
+pub(crate) fn run_shell(config: ShellConfig) -> Result<Value, ErrorOld> {
     let ShellConfig { env } = config;
     let mut runtime = Runtime::new(env);
     let mut symbols = Symbols::new();
@@ -68,7 +67,7 @@ fn read_and_evaluate_line(symbols: &mut Symbols, runtime: &mut Runtime, stdin: &
     Ok(value)
 }
 
-fn run_string(script: String, env: Env) -> Result<Value, Error> {
+fn run_string(script: String, env: Env) -> Result<Value, ErrorOld> {
     let raw_tree = parse_string(parser(), &script)?;
     let mut symbols = Symbols::new();
     let typed_tree = raw_tree.into_typed(&mut symbols)?;

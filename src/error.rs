@@ -3,17 +3,45 @@ use std::io;
 use std::num::ParseIntError;
 use clap::parser::MatchesError;
 use jati::error::Error as JatiError;
-use crate::lang::runtime::RunError;
 
-#[derive(Debug)]
-pub enum Error {
-    Tsv(TsvError),
-    Jati(JatiError),
-    Clap(clap::Error),
-    Io(io::Error),
-    ParseInt(ParseIntError),
-    Matches(MatchesError),
-    Run(RunError),
+#[derive(Debug, Clone)]
+pub struct Error {
+    contexts: Vec<String>,
+    message: String,
+}
+
+impl Error {
+    pub(crate) fn new(message: String) -> Error {
+        let contexts: Vec<String> = Vec::new();
+        Error { contexts, message }
+    }
+    pub(crate) fn add_context(self, context: String) -> Error {
+        let Error { mut contexts, message } = self;
+        contexts.push(context);
+        Error { contexts, message }
+    }
+    pub(crate) fn add_str(self, context: &str) -> Error {
+        self.add_context(String::from(context))
+    }
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        for context in self.contexts.iter().rev() {
+            write!(f, "{}: ", context)?;
+        }
+        writeln!(f, "{}", self.message)
+    }
+}
+
+impl std::error::Error for Error {}
+
+impl From<String> for Error {
+    fn from(message: String) -> Self { Error::new(message) }
+}
+
+impl From<&str> for Error {
+    fn from(message: &str) -> Self { Error::new(String::from(message)) }
 }
 
 #[derive(Debug)]
@@ -21,59 +49,48 @@ pub struct TsvError {
     message: String,
 }
 
-impl From<String> for Error {
-    fn from(message: String) -> Self {
-        Error::Tsv(TsvError { message })
+impl From<JatiError> for ErrorOld {
+    fn from(jati_error: JatiError) -> Self {
+        Error::from(jati_error.to_string()).add_str("Jati")
     }
-}
-
-impl From<&str> for Error {
-    fn from(message: &str) -> Self {
-        Error::from(String::from(message))
-    }
-}
-
-impl From<JatiError> for Error {
-    fn from(jati_error: JatiError) -> Self { Error::Jati(jati_error) }
 }
 
 impl From<clap::Error> for Error {
     fn from(clap_error: clap::Error) -> Self {
-        Error::Clap(clap_error)
+        Error::from(clap_error.to_string()).add_str("Clap")
     }
 }
 
 impl From<io::Error> for Error {
     fn from(io_error: io::Error) -> Self {
-        Error::Io(io_error)
+        Error::from(io_error.to_string()).add_str("IO")
     }
 }
 
 impl From<ParseIntError> for Error {
-    fn from(parse_int_error: ParseIntError) -> Self { Error::ParseInt(parse_int_error) }
-}
-
-impl From<MatchesError> for Error {
-    fn from(matches_error: MatchesError) -> Self { Error::Matches(matches_error) }
-}
-
-impl From<RunError> for Error {
-    fn from(run_error: RunError) -> Self { Error::Run(run_error) }
-}
-
-impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Error::Tsv(tsv_error) => { writeln!(f, "{}", tsv_error.message) }
-            Error::Jati(jati_error) => { writeln!(f, "{}", jati_error) }
-            Error::Clap(clap_error) => { writeln!(f, "{}", clap_error) }
-            Error::Io(io_error) => { writeln!(f, "{}", io_error) }
-            Error::ParseInt(parse_int_error) => { writeln!(f, "{}", parse_int_error) }
-            Error::Matches(matches_error) => { writeln!(f, "{}", matches_error) }
-            Error::Run(run_error) => { writeln!(f, "{}", run_error) }
-        }
+    fn from(parse_int_error: ParseIntError) -> Self {
+        Error::from(parse_int_error.to_string()).add_str("ParseIntError")
     }
 }
 
-impl std::error::Error for Error {}
+impl From<MatchesError> for Error {
+    fn from(matches_error: MatchesError) -> Self {
+        Error::from(matches_error.to_string()).add_str("Clap parse matches")
+    }
+}
+
+impl From<RunError> for Error {
+    fn from(run_error: RunError) -> Self {
+        Error::from(run_error.to_string()).add_str("Run error")
+    }
+}
+
+pub(crate) fn map_err<T, E: std::error::Error>(result: Result<T, E>, name: &str)
+                                                   -> Result<T, Error> {
+    result.map_err(|error| {
+        let mut error = Error::from(error.to_string());
+        error.add_context(name.to_string());
+        error
+    })
+}
 

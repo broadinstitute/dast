@@ -3,7 +3,7 @@ use jati::trees::types::Type;
 use crate::lang::fun::builtin::Gen;
 use crate::lang::fun::Fun;
 use crate::lang::fun::util::check_n_args;
-use crate::lang::runtime::{RunResult, Runtime};
+use crate::lang::runtime::Runtime;
 use crate::Value;
 
 pub(crate) struct Quit {}

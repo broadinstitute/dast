@@ -1,5 +1,4 @@
 use std::mem;
-use crate::Error;
 
 enum ParseState {
     BeforeValue,
@@ -8,7 +7,7 @@ enum ParseState {
     AfterClosingQuote,
 }
 
-pub(crate) fn parse_line(line: &str) -> Result<Vec<String>, Error> {
+pub(crate) fn parse_line(line: &str) -> Result<Vec<String>, ErrorOld> {
     let mut values: Vec<String> = Vec::new();
     let mut value = String::new();
     let mut state = ParseState::BeforeValue;
@@ -50,7 +49,7 @@ pub(crate) fn parse_line(line: &str) -> Result<Vec<String>, Error> {
                         push_value(&mut values, &mut value, &mut state);
                     }
                     _ => {
-                        Err(Error::from(format!("After a closing quote, only comma, \
+                        Err(ErrorOld::from(format!("After a closing quote, only comma, \
                         opening quote or line end are allowed, but got '{}'", char)))?
                     }
                 }

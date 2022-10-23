@@ -8,7 +8,7 @@ use crate::lang::value::Value;
 use std::io::Write;
 use crate::lang::fun::builtin::Gen;
 use crate::lang::fun::util::check_n_args;
-use crate::lang::runtime::{map_err_run, RunError, RunResult, Runtime};
+use crate::lang::runtime::Runtime;
 
 pub(crate) struct MungeForMetastaar {}
 

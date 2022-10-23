@@ -11,21 +11,11 @@ pub(crate) struct Runtime {
     exit_result: Option<RunResult>,
 }
 
-#[derive(Debug)]
-pub struct RunError {
-    contexts: Vec<String>,
-    message: String,
-}
-
 impl From<String> for RunError {
     fn from(message: String) -> Self {
         let contexts = Vec::new();
         RunError { contexts, message }
     }
-}
-
-impl From<&str> for RunError {
-    fn from(message: &str) -> Self { RunError::from(message.to_string()) }
 }
 
 impl RunError {
@@ -48,17 +38,6 @@ impl Display for RunError {
 }
 
 impl std::error::Error for RunError {}
-
-pub(crate) fn map_err_run<T, E: std::error::Error>(result: Result<T, E>, name: &str)
-                                                   -> Result<T, RunError> {
-    result.map_err(|error| {
-        let mut run_error = RunError::from(error.to_string());
-        run_error.add_context(name.to_string());
-        run_error
-    })
-}
-
-pub(crate) type RunResult = Result<Value, RunError>;
 
 impl Runtime {
     pub(crate) fn new(env: Env) -> Runtime {
