@@ -5,8 +5,8 @@ pub(crate) mod env;
 mod var;
 mod fun;
 
+use std::fs::read_to_string;
 use std::io::{stdin, Stdin, stdout, Write};
-use fs_err::read_to_string;
 use jati::parse::parsers::id::RustIdParser;
 use jati::parse::parsers::script::ScriptParser;
 use jati::parse::parsers::white::DefaultWhiteSpaceParser;
@@ -24,7 +24,7 @@ pub(crate) fn run_script(config: ScriptConfig) -> Result<Value, Error> {
     for (key, values) in &env.args {
         println!("{}: {}", key, values.join(" "))
     }
-    let script = read_to_string(&script_file)?;
+    let script = map_err(read_to_string(&script_file), &script_file)?;
     println!("=== Begin of nitro script ===\n{}\n=== End of nitro script ===", script);
     run_string(script, env)
 }

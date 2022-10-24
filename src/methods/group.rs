@@ -1,4 +1,4 @@
-use fs_err::File;
+use std::fs::File;
 use std::io::{BufReader, BufRead};
 use crate::col_names::ColNames;
 use crate::error::{Error, map_err};
