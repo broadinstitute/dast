@@ -12,12 +12,13 @@ use jati::parse::parsers::script::ScriptParser;
 use jati::parse::parsers::white::DefaultWhiteSpaceParser;
 use jati::parse_string;
 use crate::config::{EvalConfig, ScriptConfig, ShellConfig};
+use crate::error::{Error, map_err};
 use crate::lang::env::Env;
 use crate::lang::runtime::Runtime;
 use crate::lang::symbols::Symbols;
 use crate::lang::value::Value;
 
-pub(crate) fn run_script(config: ScriptConfig) -> Result<Value, ErrorOld> {
+pub(crate) fn run_script(config: ScriptConfig) -> Result<Value, Error> {
     let ScriptConfig { script_file, env } = config;
     println!("script file: {}", script_file);
     for (key, values) in &env.args {
@@ -28,12 +29,12 @@ pub(crate) fn run_script(config: ScriptConfig) -> Result<Value, ErrorOld> {
     run_string(script, env)
 }
 
-pub(crate) fn evaluate_expression(config: EvalConfig) -> Result<Value, ErrorOld> {
+pub(crate) fn evaluate_expression(config: EvalConfig) -> Result<Value, Error> {
     let EvalConfig { string, env } = config;
     run_string(string, env)
 }
 
-pub(crate) fn run_shell(config: ShellConfig) -> Result<Value, ErrorOld> {
+pub(crate) fn run_shell(config: ShellConfig) -> Result<Value, Error> {
     let ShellConfig { env } = config;
     let mut runtime = Runtime::new(env);
     let mut symbols = Symbols::new();
@@ -53,26 +54,26 @@ pub(crate) fn run_shell(config: ShellConfig) -> Result<Value, ErrorOld> {
 }
 
 fn read_and_evaluate_line(symbols: &mut Symbols, runtime: &mut Runtime, stdin: &mut Stdin)
-    -> RunResult {
+    -> Result<Value, Error> {
     print!("Tups> ");
-    map_err_run(stdout().flush(), "STDOUT")?;
+    map_err(stdout().flush(), "STDOUT")?;
     let mut input = String::new();
-    map_err_run(stdin.read_line(&mut input), "STDIN")?;
+    map_err(stdin.read_line(&mut input), "STDIN")?;
     println!("{}", input);
     let raw_tree =
-        map_err_run(parse_string(parser(), &input), "Parsing error")?;
+        map_err(parse_string(parser(), &input), "Parsing error")?;
     let typed_tree =
-        map_err_run(raw_tree.into_typed(symbols), "Typing error")?;
+        map_err(raw_tree.into_typed(symbols), "Typing error")?;
     let value = runtime.evaluate(&typed_tree)?;
     Ok(value)
 }
 
-fn run_string(script: String, env: Env) -> Result<Value, ErrorOld> {
+fn run_string(script: String, env: Env) -> Result<Value, Error> {
     let raw_tree = parse_string(parser(), &script)?;
     let mut symbols = Symbols::new();
     let typed_tree = raw_tree.into_typed(&mut symbols)?;
     let mut runtime = Runtime::new(env);
-    let value = map_err_run(runtime.evaluate(&typed_tree), "Evaluation error")?;
+    let value = map_err(runtime.evaluate(&typed_tree), "Evaluation error")?;
     Ok(value)
 }
 

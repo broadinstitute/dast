@@ -44,12 +44,7 @@ impl From<&str> for Error {
     fn from(message: &str) -> Self { Error::new(String::from(message)) }
 }
 
-#[derive(Debug)]
-pub struct TsvError {
-    message: String,
-}
-
-impl From<JatiError> for ErrorOld {
+impl From<JatiError> for Error {
     fn from(jati_error: JatiError) -> Self {
         Error::from(jati_error.to_string()).add_str("Jati")
     }
@@ -79,18 +74,10 @@ impl From<MatchesError> for Error {
     }
 }
 
-impl From<RunError> for Error {
-    fn from(run_error: RunError) -> Self {
-        Error::from(run_error.to_string()).add_str("Run error")
-    }
-}
-
 pub(crate) fn map_err<T, E: std::error::Error>(result: Result<T, E>, name: &str)
                                                    -> Result<T, Error> {
     result.map_err(|error| {
-        let mut error = Error::from(error.to_string());
-        error.add_context(name.to_string());
-        error
+        Error::from(error.to_string()).add_context(name.to_string())
     })
 }
 

@@ -8,6 +8,7 @@ use crate::Value;
 use crate::lang::fun::util::check_n_args;
 use crate::lang::runtime::Runtime;
 use rand::seq::SliceRandom;
+use crate::error::Error;
 
 pub(crate) struct Wisdom {}
 
@@ -63,7 +64,7 @@ impl Fun for Wisdom {
     fn check_arg_types(&self, arg_types: &[Type]) -> Result<(), ArgsFailure> {
         check_n_args(arg_types, 0)
     }
-    fn call(&self, _args: Vec<Value>, _runtime: &mut Runtime) -> RunResult {
+    fn call(&self, _args: Vec<Value>, _runtime: &mut Runtime) -> Result<Value, Error> {
         let mut rng = thread_rng();
         let message = format!("{}", QUOTES.choose(&mut rng).unwrap());
         Ok(Value::String(message))

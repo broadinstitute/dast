@@ -50,7 +50,7 @@ fn subcommand_to_tups_choice() -> Option<Choice> {
 }
 
 impl Config {
-    pub(crate) fn new() -> Result<Config, ErrorOld> {
+    pub(crate) fn new() -> Result<Config, Error> {
         match subcommand_to_tups_choice() {
             Some(choice) => {
                 match choice {
@@ -64,7 +64,7 @@ impl Config {
             }
         }
     }
-    pub fn new_script_config() -> Result<ScriptConfig, ErrorOld> {
+    pub fn new_script_config() -> Result<ScriptConfig, Error> {
         let mut args = args();
         let script_file =
             args.nth(2).ok_or_else(|| {
@@ -73,7 +73,7 @@ impl Config {
         let env = Env::new();
         Ok(ScriptConfig { script_file, env })
     }
-    pub fn new_eval_config() -> Result<EvalConfig, ErrorOld> {
+    pub fn new_eval_config() -> Result<EvalConfig, Error> {
         let mut args = args();
         let string =
             args.nth(2).ok_or_else(|| {
@@ -82,11 +82,11 @@ impl Config {
         let env = Env::new();
         Ok(EvalConfig { string, env })
     }
-    pub fn new_shell_config() -> Result<ShellConfig, ErrorOld> {
+    pub fn new_shell_config() -> Result<ShellConfig, Error> {
         let env = Env::new();
         Ok(ShellConfig { env })
     }
-    pub fn new_clap_parsed() -> Result<Config, ErrorOld> {
+    pub fn new_clap_parsed() -> Result<Config, Error> {
         let app = command!()
             .propagate_version(true)
             .subcommand_required(true)

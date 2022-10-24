@@ -6,6 +6,7 @@ use crate::data::csv;
 use crate::lang::fun::Fun;
 use crate::lang::value::Value;
 use std::io::Write;
+use crate::error::{Error, map_err};
 use crate::lang::fun::builtin::Gen;
 use crate::lang::fun::util::check_n_args;
 use crate::lang::runtime::Runtime;
@@ -79,37 +80,36 @@ impl Fun for MungeForMetastaar {
     fn check_arg_types(&self, arg_types: &[Type]) -> Result<(), ArgsFailure> {
         check_n_args(arg_types, 0)
     }
-    fn call(&self, args: Vec<Value>, runtime: &mut Runtime) -> RunResult {
+    fn call(&self, args: Vec<Value>, runtime: &mut Runtime) -> Result<Value, Error> {
         if !args.is_empty() {
-            return Err(RunError::from("Fun takes no arguments"));
+            return Err(Error::from("Fun takes no arguments"));
         }
         let env = runtime.env();
         let input_file_name = env.get_arg("i")?;
         let output_file_name = env.get_arg("o")?;
         let reader =
             BufReader::new(
-                map_err_run(File::open(input_file_name), input_file_name)?
+                map_err(File::open(input_file_name), input_file_name)?
             );
         let mut lines = reader.lines();
         let header_line =
-            map_err_run(map_err_run(lines.next().ok_or_else(|| {
-                RunError::from("File is empty")
+            map_err(map_err(lines.next().ok_or_else(|| {
+                Error::from("File is empty")
             }), input_file_name)?, input_file_name)?;
         let headers: Vec<String> =
-            map_err_run(csv::parse_line(&header_line), input_file_name)?
+            map_err(csv::parse_line(&header_line), input_file_name)?
                 .into_iter().map(map_header).collect();
         let mut writer =
             BufWriter::new(
-                map_err_run(File::create(output_file_name), output_file_name)?
+                map_err(File::create(output_file_name), output_file_name)?
             );
         for header in &headers {
             println!("{}", header)
         }
-        map_err_run(writeln!(writer, "{}", headers.join(",")), output_file_name)?;
+        map_err(writeln!(writer, "{}", headers.join(",")), output_file_name)?;
         for line in lines {
-            let line = map_err_run(line, input_file_name)?;
-            let values =
-                map_err_run(csv::parse_line(&line), output_file_name)?;
+            let line = map_err(line, input_file_name)?;
+            let values = map_err(csv::parse_line(&line), output_file_name)?;
             let mut numbers =
                 values.iter().map(|value| { convert_to_number(value) });
             let mut out_line = String::new();
@@ -120,7 +120,7 @@ impl Fun for MungeForMetastaar {
                     out_line.push_str(&number.to_string());
                 }
             }
-            map_err_run(writeln!(writer, "{}", out_line), output_file_name)?;
+            map_err(writeln!(writer, "{}", out_line), output_file_name)?;
         }
         Ok(Value::Unit)
     }

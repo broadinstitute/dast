@@ -1,5 +1,6 @@
 use jati::trees::symbols::ArgsFailure;
 use jati::trees::types::Type;
+use crate::error::Error;
 use crate::group::group;
 use crate::lang::fun::builtin::Gen;
 use crate::lang::fun::Fun;
@@ -18,9 +19,9 @@ impl Fun for Group {
     fn check_arg_types(&self, arg_types: &[Type]) -> Result<(), ArgsFailure> {
         check_n_args(arg_types, 0)
     }
-    fn call(&self, args: Vec<Value>, runtime: &mut Runtime) -> RunResult {
+    fn call(&self, args: Vec<Value>, runtime: &mut Runtime) -> Result<Value, Error> {
         if !args.is_empty() {
-            return Err(RunError::from("Fun takes no arguments"));
+            return Err(Error::from("Fun takes no arguments"));
         }
         let env = runtime.env();
         let input = env.get_arg("i")?;

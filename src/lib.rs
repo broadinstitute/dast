@@ -1,5 +1,6 @@
 use methods::group;
 use crate::config::Config;
+use crate::error::Error;
 use crate::lang::value::Value;
 
 mod config;
@@ -9,7 +10,7 @@ mod lang;
 mod data;
 mod methods;
 
-pub fn run() -> Result<Value, ErrorOld> {
+pub fn run() -> Result<Value, Error> {
     let config = Config::new()?;
     match config {
         Config::Script(nitro_config) => {

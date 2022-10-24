@@ -1,3 +1,4 @@
+use crate::error::Error;
 
 pub(crate) struct ColNames {
     names: Vec<String>,
@@ -17,7 +18,7 @@ impl ColNames {
         let names = Vec::new();
         ColNames { names }
     }
-    pub(crate) fn index_for(&self, col: &str) -> Result<usize, ErrorOld> {
+    pub(crate) fn index_for(&self, col: &str) -> Result<usize, Error> {
         match index_for_raw(&self.names, col) {
             Some(i) => {
                 Ok(i)
