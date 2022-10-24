@@ -9,6 +9,7 @@ mod col_names;
 mod lang;
 mod data;
 mod methods;
+mod about;
 
 pub fn run() -> Result<Value, Error> {
     let config = Config::new()?;
@@ -21,6 +22,15 @@ pub fn run() -> Result<Value, Error> {
         }
         Config::Shell(shell_config) => {
             lang::run_shell(shell_config)
+        }
+        Config::Version => {
+            println!("{}", about::name_and_version()
+                .unwrap_or_else(|| "No version available".to_string()));
+            Ok(Value::Unit)
+        }
+        Config::Help => {
+            println!("{}", about::about());
+            Ok(Value::Unit)
         }
     }
 }

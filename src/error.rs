@@ -1,7 +1,6 @@
 use std::fmt::{Display, Formatter};
 use std::io;
 use std::num::ParseIntError;
-use clap::parser::MatchesError;
 use jati::error::Error as JatiError;
 
 #[derive(Debug, Clone)]
@@ -50,12 +49,6 @@ impl From<JatiError> for Error {
     }
 }
 
-impl From<clap::Error> for Error {
-    fn from(clap_error: clap::Error) -> Self {
-        Error::from(clap_error.to_string()).add_str("Clap")
-    }
-}
-
 impl From<io::Error> for Error {
     fn from(io_error: io::Error) -> Self {
         Error::from(io_error.to_string()).add_str("IO")
@@ -65,12 +58,6 @@ impl From<io::Error> for Error {
 impl From<ParseIntError> for Error {
     fn from(parse_int_error: ParseIntError) -> Self {
         Error::from(parse_int_error.to_string()).add_str("ParseIntError")
-    }
-}
-
-impl From<MatchesError> for Error {
-    fn from(matches_error: MatchesError) -> Self {
-        Error::from(matches_error.to_string()).add_str("Clap parse matches")
     }
 }
 
