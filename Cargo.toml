@@ -11,6 +11,6 @@ license = "BSD-3-Clause"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-jati = { git = "https://github.com/broadinstitute/jati", rev = "a4fed24" }
+jati = { git = "https://github.com/broadinstitute/jati", rev = "b52d2cc" }
 rand = "0.8.5"
 
