@@ -10,7 +10,7 @@ pub(crate) fn homepage() -> Option<&'static str> { option_env!("CARGO_PKG_HOMEPA
 
 pub(crate) fn repository() -> Option<&'static str> { option_env!("CARGO_PKG_REPOSITORY") }
 
-const USAGE: &str = "\
+pub(crate) const USAGE: &str = "\
 USAGE:
     tups script <script file>  - Execute script file
     tups eval <expression>     - Evaluate expression

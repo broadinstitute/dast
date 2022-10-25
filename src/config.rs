@@ -1,4 +1,5 @@
 use std::env::args;
+use crate::about;
 use crate::error::Error;
 use crate::lang::env::Env;
 
@@ -63,8 +64,8 @@ fn subcommand_to_choice() -> Result<Choice, Error> {
 impl Config {
     pub(crate) fn new() -> Result<Config, Error> {
         match subcommand_to_choice()? {
-            Choice::Script => { Ok(Config::Eval(Config::new_eval_config()?)) }
-            Choice::Eval => { Ok(Config::Script(Config::new_script_config()?)) }
+            Choice::Script => { Ok(Config::Script(Config::new_script_config()?)) }
+            Choice::Eval => { Ok(Config::Eval(Config::new_eval_config()?)) }
             Choice::Shell => { Ok(Config::Shell(Config::new_shell_config()?)) }
             Choice::Version => { Ok(Config::Version) }
             Choice::Help => { Ok(Config::Help) }
@@ -74,7 +75,7 @@ impl Config {
         let mut args = args();
         let script_file =
             args.nth(2).ok_or_else(|| {
-                Error::from("Missing script file argument.")
+                Error::from(format!("Missing script file argument.\n{}", about::USAGE))
             })?;
         let env = Env::new();
         Ok(ScriptConfig { script_file, env })
@@ -83,7 +84,7 @@ impl Config {
         let mut args = args();
         let string =
             args.nth(2).ok_or_else(|| {
-                Error::from("Missing expression argument.")
+                Error::from(format!("Missing expression argument.\n{}", about::USAGE))
             })?;
         let env = Env::new();
         Ok(EvalConfig { string, env })
