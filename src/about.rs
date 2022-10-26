@@ -14,7 +14,9 @@ pub(crate) const USAGE: &str = "\
 USAGE:
     tups script <script file>  - Execute script file
     tups eval <expression>     - Evaluate expression
-    tups shell                 - Open shell";
+    tups shell                 - Open shell
+    tups version               - Print version
+    tups help                  - Print help";
 
 fn push_line(string: &mut String, suffix: &str) {
     string.push_str(suffix);

@@ -24,13 +24,12 @@ pub fn run() -> Result<Value, Error> {
             lang::run_shell(shell_config)
         }
         Config::Version => {
-            println!("{}", about::name_and_version()
+            let version = format!("{}", about::name_and_version()
                 .unwrap_or_else(|| "No version available".to_string()));
-            Ok(Value::Unit)
+            Ok(Value::String(version))
         }
         Config::Help => {
-            println!("{}", about::about());
-            Ok(Value::Unit)
+            Ok(Value::String(about::about()))
         }
     }
 }
