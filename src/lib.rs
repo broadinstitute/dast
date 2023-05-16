@@ -24,8 +24,8 @@ pub fn run() -> Result<Value, Error> {
             lang::run_shell(shell_config)
         }
         Config::Version => {
-            let version = format!("{}", about::name_and_version()
-                .unwrap_or_else(|| "No version available".to_string()));
+            let version =
+                about::name_and_version().unwrap_or_else(|| "No version available".to_string());
             Ok(Value::String(version))
         }
         Config::Help => {
