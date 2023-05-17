@@ -1,1 +1,2 @@
-pub mod group;
+pub(crate) mod group;
+pub(crate) mod phenet;
