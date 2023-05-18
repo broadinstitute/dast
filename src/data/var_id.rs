@@ -28,10 +28,10 @@ impl Chromosome {
 
 #[derive(Eq, PartialOrd, PartialEq, Ord)]
 pub(crate) struct VarId {
-    chrom: Chromosome,
-    pos: usize,
-    seq_ref: String,
-    seq_alt: String,
+    pub(crate) chrom: Chromosome,
+    pub(crate) pos: usize,
+    pub(crate) seq_ref: String,
+    pub(crate) seq_alt: String,
 }
 
 impl VarId {

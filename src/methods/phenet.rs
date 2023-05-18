@@ -16,6 +16,9 @@ pub(crate) fn phenet(input: &str, output: &str, z_threshold: f64) -> Result<Valu
         TsvReader::from_reader(BufReader::new(
             map_err(File::open(input), input)?
         ))?;
+    let var_id_col =
+        tsv_reader.header.first()
+            .ok_or_else(|| Error::from("Input file header line is empty"))?.to_string();
     let mut records: Vec<Record> = Vec::new();
     for row_res in tsv_reader {
         let row = row_res?;
@@ -33,9 +36,11 @@ pub(crate) fn phenet(input: &str, output: &str, z_threshold: f64) -> Result<Valu
     }
     records.sort_by(|r1, r2| r1.var_id.cmp(&r2.var_id));
     let mut out_file = map_err(File::create(output), output)?;
-    writeln!(out_file, "Var_ID\tz_endo")?;
-    for record in records {
-        writeln!(out_file, "{}\t{}", record.var_id, record.endo_z)?;
+    writeln!(out_file, "i\t{}\tchrom\tpos\tref\talt\tz_endo\tabs(z_endo)", var_id_col)?;
+    for (i, record) in records.iter().enumerate() {
+        writeln!(out_file, "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}", i, record.var_id, record.var_id.chrom,
+                 record.var_id.pos, record.var_id.seq_ref, record.var_id.seq_alt, record.endo_z,
+                 record.endo_z.abs())?;
     }
     Ok(Value::Unit)
 }

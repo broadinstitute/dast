@@ -2,7 +2,7 @@ use std::io::{BufRead, Error as IoError};
 use crate::error::Error;
 
 pub(crate) struct TsvReader {
-    header: Vec<String>,
+    pub(crate) header: Vec<String>,
     lines: Box<dyn Iterator<Item=Result<String, IoError>>>,
 }
 
