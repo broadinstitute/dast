@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 use crate::error::Error;
 
 pub(crate) struct Env {
-    pub(crate) args: BTreeMap<String, Vec<String>>
+    pub(crate) args: BTreeMap<String, Vec<String>>,
 }
 
 impl Env {
@@ -43,6 +43,23 @@ impl Env {
                     values.first().ok_or_else(|| {
                         Error::from(format!("Missing argument {}", key))
                     })
+                }
+            }
+        }
+    }
+    pub(crate) fn get_opt_arg(&self, key: &str) -> Result<Option<&String>, Error> {
+        match self.args.get(key) {
+            None => { Ok(None) }
+            Some(values) => {
+                if values.len() > 1 {
+                    Err(Error::from(format!(
+                        "Argument {} should have exactly one value, but has {}.", key,
+                        values.len())
+                    ))
+                } else {
+                    values.first().ok_or_else(|| {
+                        Error::from(format!("Missing argument {}", key))
+                    }).map(Some)
                 }
             }
         }

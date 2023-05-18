@@ -25,6 +25,12 @@ impl Fun for Phenet {
         }
         let env = runtime.env();
         let input = env.get_arg("i")?;
-        phenet(input)
+        let output = env.get_arg("o")?;
+        let z_threshold =
+            match env.get_opt_arg("z")? {
+                None => { 0.0 }
+                Some(arg) => { arg.parse::<f64>()? }
+            };
+         phenet(input, output, z_threshold)
     }
 }

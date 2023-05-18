@@ -1,6 +1,6 @@
 use std::fmt::{Display, Formatter};
 use std::io;
-use std::num::ParseIntError;
+use std::num::{ParseFloatError, ParseIntError};
 use jati::error::Error as JatiError;
 
 #[derive(Debug, Clone)]
@@ -29,7 +29,7 @@ impl Display for Error {
         if let Some(message) = message_iter.next() {
             let mut line = String::from(message);
             for message in message_iter {
-                line.push(':');
+                line.push_str(": ");
                 if message.contains('\n') || message.contains('\r') || message.len() > 77 {
                     writeln!(f, "{}", line)?;
                     write!(f, "{}", message)?;
@@ -74,6 +74,12 @@ impl From<io::Error> for Error {
 impl From<ParseIntError> for Error {
     fn from(parse_int_error: ParseIntError) -> Self {
         Error::from(parse_int_error.to_string()).add_str("ParseIntError")
+    }
+}
+
+impl From<ParseFloatError> for Error {
+    fn from(parse_float_error: ParseFloatError) -> Self {
+        Error::from(parse_float_error.to_string()).add_str("ParseFloatError")
     }
 }
 
