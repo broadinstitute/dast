@@ -13,4 +13,5 @@ license = "BSD-3-Clause"
 [dependencies]
 jati = { git = "https://github.com/broadinstitute/jati", rev = "b52d2cc" }
 rand = "0.8.5"
+statrs = "0.16.0"
 
