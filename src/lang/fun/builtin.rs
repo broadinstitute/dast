@@ -4,12 +4,14 @@ use crate::lang::fun::builtin::wisdom::Wisdom;
 use crate::lang::fun::builtin::munge_for_metastaar::MungeForMetastaar;
 use crate::lang::fun::builtin::phenet::Phenet;
 use crate::lang::fun::builtin::quit::Quit;
+use crate::lang::fun::builtin::subset_wilcox::SubsetWilcox;
 
 pub(crate) mod munge_for_metastaar;
 pub(crate) mod wisdom;
 pub(crate) mod quit;
 mod group;
 mod phenet;
+mod subset_wilcox;
 
 pub(crate) trait Gen where Self: Fun {
     fn new() -> Self;
@@ -24,7 +26,8 @@ pub(crate) fn get_builtins() -> Vec<FunRef> {
     let fortune = get_fun_ref::<Wisdom>("wisdom");
     let quit = get_fun_ref::<Quit>("quit");
     let phenet = get_fun_ref::<Phenet>("phenet");
-    vec![munge_for_metastaar, fortune, quit, phenet]
+    let subset_wilcox = get_fun_ref::<SubsetWilcox>("subset_wilcox");
+    vec![munge_for_metastaar, fortune, quit, phenet, subset_wilcox]
 }
 
 fn add_fun(funs: &mut BTreeMap<String, FunRef>, fun_ref: FunRef) {

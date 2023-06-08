@@ -33,8 +33,12 @@ pub(crate) fn subset_wilcox(ranks_file: &str, ranks_file_col: &str, subset_file:
         } else {
             n_others += 1;
         }
-        let u = rank_sum - n_subset * (n_subset + 1) / 2;
-
     }
-    todo!()
+    println!("n_subset = {}", n_subset);
+    println!("n_others = {}", n_others);
+    let subset_average_rank = (rank_sum as f64) / (n_subset as f64);
+    println!("subset_average_rank = {}", subset_average_rank);
+    let u = rank_sum - n_subset * (n_subset + 1) / 2;
+    println!("u = {}", u);
+    Ok(Value::Unit)
 }

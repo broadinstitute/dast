@@ -6,15 +6,15 @@ use crate::lang::fun::Fun;
 use crate::lang::fun::util::check_n_args;
 use crate::lang::runtime::Runtime;
 use crate::lang::value::Value;
-use crate::methods::phenet::phenet;
+use crate::methods::subset_wilcox::subset_wilcox;
 
-pub(crate) struct Phenet {}
+pub(crate) struct SubsetWilcox {}
 
-impl Gen for Phenet {
-    fn new() -> Self { Phenet {} }
+impl Gen for SubsetWilcox {
+    fn new() -> Self { SubsetWilcox {} }
 }
 
-impl Fun for Phenet {
+impl Fun for SubsetWilcox {
     fn tpe(&self) -> Type { Type::Unit }
     fn check_arg_types(&self, arg_types: &[Type]) -> Result<(), ArgsFailure> {
         check_n_args(arg_types, 0)
@@ -24,13 +24,9 @@ impl Fun for Phenet {
             return Err(Error::from("Fun takes no arguments"));
         }
         let env = runtime.env();
-        let input = env.get_arg("i")?;
-        let output = env.get_arg("o")?;
-        let z_threshold =
-            match env.get_opt_arg("z")? {
-                None => { 0.0 }
-                Some(arg) => { arg.parse::<f64>()? }
-            };
-        phenet(input, output, z_threshold)
+        let ranks_file = env.get_arg("ranks-file")?;
+        let ranks_file_col = env.get_arg("ranks-file-col")?;
+        let subset_file = env.get_arg("subset-file")?;
+        subset_wilcox(ranks_file, ranks_file_col, subset_file)
     }
 }
