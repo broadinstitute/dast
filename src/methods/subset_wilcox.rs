@@ -1,6 +1,7 @@
 use std::collections::BTreeSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use statrs::function::erf::erfc;
 use crate::data::tsv::TsvReader;
 use crate::error::Error;
 use crate::lang::value::Value;
@@ -40,5 +41,17 @@ pub(crate) fn subset_wilcox(ranks_file: &str, ranks_file_col: &str, subset_file:
     println!("subset_average_rank = {}", subset_average_rank);
     let u = rank_sum - n_subset * (n_subset + 1) / 2;
     println!("u = {}", u);
+    let u2 = n_subset * n_others - u;
+    println!("u2 = {}", u2);
+    let n_total = n_subset + n_others;
+    println!("n_total = {}", n_total);
+    let mean_u = (n_subset as f64) * (n_total as f64) / 2.0;
+    println!("mean_u = {}", mean_u);
+    let var_u = ((n_subset * (n_total - n_subset)) as f64) / 2.0;
+    println!("var_u = {}", var_u);
+    let x = ((u as f64) - mean_u) / var_u.sqrt();
+    println!("x = {}", x);
+    let p = erfc(x.abs());
+    println!("p = {}", p);
     Ok(Value::Unit)
 }
