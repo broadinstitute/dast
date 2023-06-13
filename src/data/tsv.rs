@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Error as IoError};
 use crate::error::Error;
@@ -5,6 +6,10 @@ use crate::error::Error;
 pub(crate) struct TsvReader {
     pub(crate) header: Vec<String>,
     lines: Box<dyn Iterator<Item=Result<String, IoError>>>,
+}
+
+fn error_missing_col(col: &str) -> Error {
+    Error::from(format!("Missing column {}.", col))
 }
 
 impl TsvReader {
@@ -20,7 +25,23 @@ impl TsvReader {
     }
     pub(crate) fn col_to_i(&self, col: &str) -> Result<usize, Error> {
         self.header.iter().position(|s| s.as_str() == col)
-            .ok_or_else(|| { Error::from(format!("Missing column {}.", col)) })
+            .ok_or_else(|| { error_missing_col(col) })
+    }
+    pub(crate) fn cols_to_is(&self, cols: &[String]) -> Result<Vec<usize>, Error> {
+        let mut i_by_col: BTreeMap<&String, usize> = BTreeMap::new();
+        for (i, col) in self.header.iter().enumerate() {
+            if cols.contains(col) {
+                i_by_col.insert(col, i);
+            }
+        }
+        let mut is: Vec<usize> = Vec::new();
+        for col in cols {
+            match i_by_col.get(col) {
+                None => { return Err(error_missing_col(col)); }
+                Some(i) => { is.push(*i) }
+            }
+        }
+        Ok(is)
     }
 }
 

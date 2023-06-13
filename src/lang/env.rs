@@ -5,6 +5,10 @@ pub(crate) struct Env {
     pub(crate) args: BTreeMap<String, Vec<String>>,
 }
 
+fn error_missing_arg(key: &str) -> Error {
+    Error::from(format!("Missing argument {}.", key))
+}
+
 impl Env {
     fn ensure_args_key(args: &mut BTreeMap<String, Vec<String>>, key: &str) {
         if !args.contains_key(key) {
@@ -32,7 +36,7 @@ impl Env {
     }
     pub(crate) fn get_arg(&self, key: &str) -> Result<&String, Error> {
         match self.args.get(key) {
-            None => { Err(Error::from(format!("Missing argument {}.", key))) }
+            None => { Err(error_missing_arg(key)) }
             Some(values) => {
                 if values.len() > 1 {
                     Err(Error::from(format!(
@@ -41,7 +45,7 @@ impl Env {
                     ))
                 } else {
                     values.first().ok_or_else(|| {
-                        Error::from(format!("Missing argument {}", key))
+                        error_missing_arg(key)
                     })
                 }
             }
@@ -58,10 +62,16 @@ impl Env {
                     ))
                 } else {
                     values.first().ok_or_else(|| {
-                        Error::from(format!("Missing argument {}", key))
+                        error_missing_arg(key)
                     }).map(Some)
                 }
             }
+        }
+    }
+    pub(crate) fn get_args(&self, key: &str) -> Result<&Vec<String>, Error> {
+        match self.args.get(key) {
+            None => { Err(error_missing_arg(key)) }
+            Some(values) => { Ok(values) }
         }
     }
 }
