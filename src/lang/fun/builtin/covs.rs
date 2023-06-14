@@ -6,15 +6,15 @@ use crate::lang::fun::Fun;
 use crate::lang::fun::util::check_n_args;
 use crate::lang::runtime::Runtime;
 use crate::lang::value::Value;
-use crate::methods::col_covs::col_covs;
+use crate::methods::covs::covs;
 
-pub(crate) struct ColCovs {}
+pub(crate) struct Covs {}
 
-impl Gen for ColCovs {
-    fn new() -> Self { ColCovs {} }
+impl Gen for Covs {
+    fn new() -> Self { Covs {} }
 }
 
-impl Fun for ColCovs {
+impl Fun for Covs {
     fn tpe(&self) -> Type { Type::Unit }
 
     fn check_arg_types(&self, arg_types: &[Type]) -> Result<(), ArgsFailure> {
@@ -27,6 +27,6 @@ impl Fun for ColCovs {
         let env = runtime.env();
         let input = env.get_arg("i")?;
         let cols = env.get_args("c")?;
-        col_covs(input, cols)
+        covs(input, cols)
     }
 }
