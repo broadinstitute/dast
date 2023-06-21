@@ -53,6 +53,7 @@ pub(crate) fn covs(file: &str, cols: &[String]) -> Result<Value, Error> {
                     cov_raw / (covars_raw[j][j] * covars_raw[k][k]).sqrt()
                 }).collect()
             }).collect();
+        println!("\t{}", cols.join("\t"));
         for (j, covars_row) in covars.iter().enumerate() {
             println!("{}\t{}", cols[j], join(covars_row, "\t"))
         }

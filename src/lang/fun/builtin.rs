@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 use crate::lang::fun::{FunRef, Fun};
+use crate::lang::fun::builtin::add_quotient::AddQuotient;
 use crate::lang::fun::builtin::covs::Covs;
 use crate::lang::fun::builtin::wisdom::Wisdom;
 use crate::lang::fun::builtin::munge_for_metastaar::MungeForMetastaar;
@@ -14,6 +15,7 @@ mod group;
 mod phenet;
 mod subset_wilcox;
 mod covs;
+mod add_quotient;
 
 pub(crate) trait Gen where Self: Fun {
     fn new() -> Self;
@@ -30,7 +32,8 @@ pub(crate) fn get_builtins() -> Vec<FunRef> {
     let phenet = get_fun_ref::<Phenet>("phenet");
     let subset_wilcox = get_fun_ref::<SubsetWilcox>("subset_wilcox");
     let covs = get_fun_ref::<Covs>("covs");
-    vec![munge_for_metastaar, fortune, quit, phenet, subset_wilcox, covs]
+    let add_quotient = get_fun_ref::<AddQuotient>("add_quotient");
+    vec![munge_for_metastaar, fortune, quit, phenet, subset_wilcox, covs, add_quotient]
 }
 
 fn add_fun(funs: &mut BTreeMap<String, FunRef>, fun_ref: FunRef) {
