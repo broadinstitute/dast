@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::{BufWriter, Write};
-use crate::data::tsv::TsvReader;
+use crate::data::tsv::{LineParser, TsvReader};
 use crate::error::Error;
 use crate::lang::value::Value;
 
@@ -11,13 +11,14 @@ fn calculate_quotient(row: &[String], i_numerator: usize, i_denominator: usize)
     Ok(num / den)
 }
 
-pub(crate) fn add_quotient(input: &str, output: &str, numerator: &str, denominator: &str)
+pub(crate) fn add_quotient(input: &str, output: &str, numerator: &str, denominator: &str,
+                           line_parser: LineParser)
                            -> Result<Value, Error> {
     println!("Input: {}", input);
     println!("Output: {}", output);
     println!("Numerator col: {}", numerator);
     println!("Denominator col: {}", denominator);
-    let reader = TsvReader::from_file(input)?;
+    let reader = TsvReader::from_file(input, line_parser)?;
     let i_numerator = reader.col_to_i(numerator)?;
     let i_denominator = reader.col_to_i(denominator)?;
     println!("i_numerator: {}", i_numerator);

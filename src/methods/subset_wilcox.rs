@@ -2,7 +2,7 @@ use std::collections::BTreeSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use statrs::function::erf::erfc;
-use crate::data::tsv::TsvReader;
+use crate::data::tsv::{LineParser, TsvReader};
 use crate::error::Error;
 use crate::lang::value::Value;
 
@@ -17,7 +17,7 @@ fn read_subset_file(subset_file: &str) -> Result<BTreeSet<String>, Error> {
 pub(crate) fn subset_wilcox(ranks_file: &str, ranks_file_col: &str, subset_file: &str)
                             -> Result<Value, Error> {
     let subset = read_subset_file(subset_file)?;
-    let ranks = TsvReader::from_file(ranks_file)?;
+    let ranks = TsvReader::from_file(ranks_file, LineParser::Tsv)?;
     let i_col = ranks.col_to_i(ranks_file_col)?;
     let mut n_subset: usize = 0;
     let mut n_others: usize = 0;

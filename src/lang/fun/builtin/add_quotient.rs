@@ -1,5 +1,6 @@
 use jati::trees::symbols::ArgsFailure;
 use jati::trees::types::Type;
+use crate::data::tsv::LineParser;
 use crate::error::Error;
 use crate::lang::fun::builtin::Gen;
 use crate::lang::fun::Fun;
@@ -29,6 +30,9 @@ impl Fun for AddQuotient {
         let output = env.get_arg("o")?;
         let numerator = env.get_arg("p")?;
         let denominator = env.get_arg("q")?;
-        add_quotient(input, output, numerator, denominator)
+        let line_parser =
+            env.get_opt_arg("f")?.map(|s| LineParser::parse(s))
+                .transpose()?.unwrap_or(LineParser::Tsv);
+        add_quotient(input, output, numerator, denominator, line_parser)
     }
 }

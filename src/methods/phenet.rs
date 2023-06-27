@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::BufReader;
-use crate::data::tsv::TsvReader;
+use crate::data::tsv::{LineParser, TsvReader};
 use crate::data::var_id::VarId;
 use crate::error::{Error, map_err};
 use crate::lang::value::Value;
@@ -20,7 +20,7 @@ pub(crate) fn phenet(input: &str, output: &str, z_threshold: f64) -> Result<Valu
     let tsv_reader =
         TsvReader::from_reader(BufReader::new(
             map_err(File::open(input), input)?
-        ))?;
+        ), LineParser::Tsv)?;
     let var_id_col =
         tsv_reader.header.first()
             .ok_or_else(|| Error::from("Input file header line is empty"))?.to_string();
