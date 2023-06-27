@@ -1,36 +1,8 @@
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Error as IoError};
-use crate::data::csv;
+use crate::data::line_parser::LineParser;
 use crate::error::Error;
-
-#[derive(Copy, Clone)]
-pub(crate) enum LineParser {
-    Tsv,
-    Csv,
-}
-
-impl LineParser {
-    pub(crate) fn parse(name: &str) -> Result<LineParser, Error> {
-        match name.trim().to_lowercase().as_str() {
-            "tsv" => { Ok(LineParser::Tsv) }
-            "csv" => { Ok(LineParser::Csv) }
-            _ => Err(Error::from(
-                format!("Unknown file format {}. Use 'tsv' or 'csv'", name.trim())
-            ))
-        }
-    }
-    fn parse_line(&self, line: &str) -> Result<Vec<String>, Error> {
-        match self {
-            LineParser::Tsv => { Ok(split_by_tab(line)) }
-            LineParser::Csv => { csv::parse_line(line) }
-        }
-    }
-}
-
-fn split_by_tab(line: &str) -> Vec<String> {
-    line.split('\t').map(|s| s.to_string()).collect::<Vec<String>>()
-}
 
 pub(crate) struct TsvReader {
     line_parser: LineParser,
@@ -47,7 +19,7 @@ impl TsvReader {
                                                     -> Result<TsvReader, Error> {
         let mut lines = Box::new(reader.lines());
         let header =
-            line_parser.parse_line(&lines.next().ok_or_else(|| {
+            line_parser.parse(&lines.next().ok_or_else(|| {
                 Error::from("No header line")
             })??)?;
         Ok(TsvReader { line_parser, header, lines })
@@ -84,9 +56,7 @@ impl Iterator for TsvReader {
         match self.lines.next() {
             None => { None }
             Some(Err(io_error)) => { Some(Err(Error::from(io_error))) }
-            Some(Ok(string)) => {
-                Some(self.line_parser.parse_line(&string))
-            }
+            Some(Ok(string)) => { Some(self.line_parser.parse(&string)) }
         }
     }
 }

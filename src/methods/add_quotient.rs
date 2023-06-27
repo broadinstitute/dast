@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::{BufWriter, Write};
-use crate::data::tsv::{LineParser, TsvReader};
+use crate::data::line_parser::LineParser;
+use crate::data::tsv::TsvReader;
 use crate::error::Error;
 use crate::lang::value::Value;
 

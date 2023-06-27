@@ -1,4 +1,5 @@
-use crate::data::tsv::{LineParser, TsvReader};
+use crate::data::line_parser::LineParser;
+use crate::data::tsv::TsvReader;
 use crate::error::Error;
 use crate::lang::value::Value;
 
@@ -18,7 +19,7 @@ fn join<T: ToString>(items: &[T], sep: &str) -> String {
 pub(crate) fn covs(file: &str, cols: &[String]) -> Result<Value, Error> {
     println!("File: {}", file);
     println!("Cols: {}", cols.join(", "));
-    let reader = TsvReader::from_file(file, LineParser::Tsv)?;
+    let reader = TsvReader::from_file(file, LineParser::new_tsv())?;
     let is = reader.cols_to_is(cols)?;
     println!("i_cols: {}", join(&is, ", "));
     let n_cols = is.len();

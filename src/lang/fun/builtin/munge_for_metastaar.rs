@@ -2,10 +2,10 @@ use std::fs::File;
 use std::io::{BufRead, BufReader, BufWriter};
 use jati::trees::types::Type;
 use jati::trees::symbols::ArgsFailure;
-use crate::data::csv;
 use crate::lang::fun::Fun;
 use crate::lang::value::Value;
 use std::io::Write;
+use crate::data::line_parser::LineParser;
 use crate::error::{Error, map_err};
 use crate::lang::fun::builtin::Gen;
 use crate::lang::fun::util::check_n_args;
@@ -96,8 +96,9 @@ impl Fun for MungeForMetastaar {
             map_err(map_err(lines.next().ok_or_else(|| {
                 Error::from("File is empty")
             }), input_file_name)?, input_file_name)?;
+        let line_parser = LineParser::new_csv();
         let headers: Vec<String> =
-            map_err(csv::parse_line(&header_line), input_file_name)?
+            map_err(line_parser.parse(&header_line), input_file_name)?
                 .into_iter().map(map_header).collect();
         let mut writer =
             BufWriter::new(
@@ -109,7 +110,7 @@ impl Fun for MungeForMetastaar {
         map_err(writeln!(writer, "{}", headers.join(",")), output_file_name)?;
         for line in lines {
             let line = map_err(line, input_file_name)?;
-            let values = map_err(csv::parse_line(&line), output_file_name)?;
+            let values = map_err(line_parser.parse(&line), output_file_name)?;
             let mut numbers =
                 values.iter().map(|value| { convert_to_number(value) });
             let mut out_line = String::new();
