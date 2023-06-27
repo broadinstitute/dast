@@ -30,9 +30,11 @@ impl Fun for AddQuotient {
         let output = env.get_arg("o")?;
         let numerator = env.get_arg("p")?;
         let denominator = env.get_arg("q")?;
+        let col_name =
+            env.get_opt_arg("n")?.map(|s|s.as_str()).unwrap_or("quot");
         let line_parser =
             env.get_opt_arg("f")?.map(|s| LineParser::from_name(s))
                 .transpose()?.unwrap_or(LineParser::new_tsv());
-        add_quotient(input, output, numerator, denominator, line_parser)
+        add_quotient(input, output, numerator, denominator, col_name, line_parser)
     }
 }

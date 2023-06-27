@@ -13,7 +13,7 @@ fn calculate_quotient(row: &[String], i_numerator: usize, i_denominator: usize)
 }
 
 pub(crate) fn add_quotient(input: &str, output: &str, numerator: &str, denominator: &str,
-                           line_parser: LineParser)
+                           col_name: &str, line_parser: LineParser)
                            -> Result<Value, Error> {
     println!("Input: {}", input);
     println!("Output: {}", output);
@@ -25,7 +25,7 @@ pub(crate) fn add_quotient(input: &str, output: &str, numerator: &str, denominat
     println!("i_numerator: {}", i_numerator);
     println!("i_denominator: {}", i_denominator);
     let mut writer = BufWriter::new(File::create(output)?);
-    writer.write_fmt(format_args!("{}\t{}\n", reader.header.join("\t"), "quot"))?;
+    writer.write_fmt(format_args!("{}\t{}\n", reader.header.join("\t"), col_name))?;
     for row in reader {
         let row = row?;
         let quot_str =
