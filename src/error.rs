@@ -2,6 +2,7 @@ use std::fmt::{Display, Formatter};
 use std::io;
 use std::num::{ParseFloatError, ParseIntError};
 use jati::error::Error as JatiError;
+use serde_json::Error as SerdeJsonError;
 
 #[derive(Debug, Clone)]
 pub struct Error {
@@ -80,6 +81,12 @@ impl From<ParseIntError> for Error {
 impl From<ParseFloatError> for Error {
     fn from(parse_float_error: ParseFloatError) -> Self {
         Error::from(parse_float_error.to_string()).add_str("ParseFloatError")
+    }
+}
+
+impl From<SerdeJsonError> for Error {
+    fn from(serde_json_error: SerdeJsonError) -> Self {
+        Error::from(serde_json_error.to_string()).add_str("Serde-JSON")
     }
 }
 

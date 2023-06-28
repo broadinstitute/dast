@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 use crate::lang::fun::{FunRef, Fun};
 use crate::lang::fun::builtin::add_quotient::AddQuotient;
 use crate::lang::fun::builtin::covs::Covs;
+use crate::lang::fun::builtin::json_to_tsv::JsonToTsv;
 use crate::lang::fun::builtin::wisdom::Wisdom;
 use crate::lang::fun::builtin::munge_for_metastaar::MungeForMetastaar;
 use crate::lang::fun::builtin::phenet::Phenet;
@@ -16,6 +17,7 @@ mod phenet;
 mod subset_wilcox;
 mod covs;
 mod add_quotient;
+mod json_to_tsv;
 
 pub(crate) trait Gen where Self: Fun {
     fn new() -> Self;
@@ -33,7 +35,8 @@ pub(crate) fn get_builtins() -> Vec<FunRef> {
     let subset_wilcox = get_fun_ref::<SubsetWilcox>("subset_wilcox");
     let covs = get_fun_ref::<Covs>("covs");
     let add_quotient = get_fun_ref::<AddQuotient>("add_quotient");
-    vec![munge_for_metastaar, fortune, quit, phenet, subset_wilcox, covs, add_quotient]
+    let json_to_tsv = get_fun_ref::<JsonToTsv>("json_to_tsv");
+    vec![munge_for_metastaar, fortune, quit, phenet, subset_wilcox, covs, add_quotient, json_to_tsv]
 }
 
 fn add_fun(funs: &mut BTreeMap<String, FunRef>, fun_ref: FunRef) {
