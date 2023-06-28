@@ -14,5 +14,5 @@ license = "BSD-3-Clause"
 jati = { git = "https://github.com/broadinstitute/jati", rev = "b52d2cc" }
 rand = "0.8.5"
 statrs = "0.16.0"
-serde_json = "1.0.99"
+serde_json = { version = "1.0.99", features = ["preserve_order"]}
 

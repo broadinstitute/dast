@@ -15,7 +15,7 @@ pub(crate) fn json_to_tsv(input: Option<&str>, output: Option<&str>, buffer_size
         JsonReader::from_reader(BufReader::new(file_or_stdin(input)?));
     let mut writer = BufWriter::new(file_or_stdout(output)?);
     let (buffer, header) = fill_buffer_and_header(&mut reader, buffer_size)?;
-    writer.write_fmt(format_args!("{}\n", header.join("\n")))?;
+    writer.write_fmt(format_args!("{}\n", header.join("\t")))?;
     write_buffered(&mut writer, buffer, &header)?;
     write_remaining(&mut writer, reader, &header)?;
     Ok(Value::Unit)
