@@ -1,6 +1,6 @@
 use std::io::{BufReader, BufWriter};
-use crate::data::line_parser::LineParser;
-use crate::data::tsv::{TsvReader, TsvWriter};
+use crate::data::io::line_parser::LineParser;
+use crate::data::io::tsv::{TsvReader, TsvWriter};
 use crate::error::Error;
 use crate::lang::value::Value;
 use crate::methods::util::io::{file_or_stdin, file_or_stdout};
@@ -20,7 +20,7 @@ pub(crate) fn add_quotient(input: Option<&str>, output: Option<&str>, numerator:
     eprintln!("Numerator col: {}", numerator);
     eprintln!("Denominator col: {}", denominator);
     let reader =
-        TsvReader::from_reader(BufReader::new(file_or_stdin(input)?), line_parser)?;
+        TsvReader::new(BufReader::new(file_or_stdin(input)?), line_parser)?;
     let i_numerator = reader.col_to_i(numerator)?;
     let i_denominator = reader.col_to_i(denominator)?;
     eprintln!("i_numerator: {}", i_numerator);

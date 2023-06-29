@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Error as IoError, Write};
-use crate::data::line_parser::LineParser;
+use crate::data::io::line_parser::LineParser;
 use crate::error::Error;
 
 pub(crate) struct TsvReader {
@@ -19,8 +19,8 @@ fn error_missing_col(col: &str) -> Error {
 }
 
 impl TsvReader {
-    pub(crate) fn from_reader<R: BufRead + 'static>(reader: R, line_parser: LineParser)
-                                                    -> Result<TsvReader, Error> {
+    pub(crate) fn new<R: BufRead + 'static>(reader: R, line_parser: LineParser)
+                                            -> Result<TsvReader, Error> {
         let mut lines = Box::new(reader.lines());
         let header =
             line_parser.parse(&lines.next().ok_or_else(|| {
@@ -29,7 +29,7 @@ impl TsvReader {
         Ok(TsvReader { line_parser, header, lines })
     }
     pub(crate) fn from_file(file: &str, line_parser: LineParser) -> Result<TsvReader, Error> {
-        Self::from_reader(BufReader::new(File::open(file)?), line_parser)
+        Self::new(BufReader::new(File::open(file)?), line_parser)
     }
     pub(crate) fn col_to_i(&self, col: &str) -> Result<usize, Error> {
         self.header.iter().position(|s| s.as_str() == col)

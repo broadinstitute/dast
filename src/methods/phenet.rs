@@ -1,12 +1,12 @@
 use std::fs::File;
 use std::io::BufReader;
-use crate::data::tsv::TsvReader;
+use crate::data::io::tsv::TsvReader;
 use crate::data::var_id::VarId;
 use crate::error::{Error, map_err};
 use crate::lang::value::Value;
 use std::io::Write;
 use statrs::function::erf::erfc;
-use crate::data::line_parser::LineParser;
+use crate::data::io::line_parser::LineParser;
 
 struct Record {
     var_id: VarId,
@@ -19,7 +19,7 @@ fn z_to_p(z: f64) -> f64 {
 
 pub(crate) fn phenet(input: &str, output: &str, z_threshold: f64) -> Result<Value, Error> {
     let tsv_reader =
-        TsvReader::from_reader(BufReader::new(
+        TsvReader::new(BufReader::new(
             map_err(File::open(input), input)?
         ), LineParser::new_tsv())?;
     let var_id_col =

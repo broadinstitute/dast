@@ -60,6 +60,6 @@ impl Display for Chromosome {
 
 impl Display for VarId {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}_{}_{}_{}", self.chrom, self.pos, self.seq_ref, self.seq_alt)
+        write!(f, "{}:{}:{}:{}", self.chrom, self.pos, self.seq_ref, self.seq_alt)
     }
 }

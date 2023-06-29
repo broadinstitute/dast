@@ -5,3 +5,4 @@ pub(crate) mod covs;
 pub(crate) mod add_quotient;
 pub(crate) mod json_to_tsv;
 pub(crate) mod util;
+pub(crate) mod clean_up_var_ids;

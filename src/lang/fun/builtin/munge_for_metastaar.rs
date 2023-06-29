@@ -5,7 +5,7 @@ use jati::trees::symbols::ArgsFailure;
 use crate::lang::fun::Fun;
 use crate::lang::value::Value;
 use std::io::Write;
-use crate::data::line_parser::LineParser;
+use crate::data::io::line_parser::LineParser;
 use crate::error::{Error, map_err};
 use crate::lang::fun::builtin::Gen;
 use crate::lang::fun::util::check_n_args;

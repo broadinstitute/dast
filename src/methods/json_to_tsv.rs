@@ -1,8 +1,8 @@
 use std::io::{BufReader, BufWriter, Write};
 use serde_json::Map;
 use serde_json::Value as JsonValue;
-use crate::data::json::JsonReader;
-use crate::data::tsv::TsvWriter;
+use crate::data::io::json::JsonReader;
+use crate::data::io::tsv::TsvWriter;
 use crate::error::Error;
 use crate::lang::value::Value;
 use crate::methods::util::io::{file_or_stdin, file_or_stdout};
@@ -13,7 +13,7 @@ type ValueMap = Map<String, JsonValue>;
 pub(crate) fn json_to_tsv(input: Option<&str>, output: Option<&str>, buffer_size: usize)
                           -> Result<Value, Error> {
     let mut reader =
-        JsonReader::from_reader(BufReader::new(file_or_stdin(input)?));
+        JsonReader::new(BufReader::new(file_or_stdin(input)?));
     let (buffer, header) = fill_buffer_and_header(&mut reader, buffer_size)?;
     let mut writer =
         TsvWriter::new(BufWriter::new(file_or_stdout(output)?), &header)?;

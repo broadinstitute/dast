@@ -7,7 +7,7 @@ pub(crate) struct JsonReader {
 }
 
 impl JsonReader {
-    pub(crate) fn from_reader<R: BufRead + 'static>(reader: R) -> JsonReader {
+    pub(crate) fn new<R: BufRead + 'static>(reader: R) -> JsonReader {
         let lines = Box::new(reader.lines());
         JsonReader { lines }
     }

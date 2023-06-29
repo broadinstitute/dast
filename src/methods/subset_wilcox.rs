@@ -2,8 +2,8 @@ use std::collections::BTreeSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use statrs::function::erf::erfc;
-use crate::data::line_parser::LineParser;
-use crate::data::tsv::TsvReader;
+use crate::data::io::line_parser::LineParser;
+use crate::data::io::tsv::TsvReader;
 use crate::error::Error;
 use crate::lang::value::Value;
 
