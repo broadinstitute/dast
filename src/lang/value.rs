@@ -5,6 +5,15 @@ pub enum Value {
     String(String),
 }
 
+impl Value {
+    pub fn is_unit(&self) -> bool {
+        match self {
+            Value::Unit => { true }
+            Value::String(_) => { false }
+        }
+    }
+}
+
 impl Display for Value {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {

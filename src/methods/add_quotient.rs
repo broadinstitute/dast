@@ -15,16 +15,10 @@ fn calculate_quotient(row: &[String], i_numerator: usize, i_denominator: usize)
 pub(crate) fn add_quotient(input: Option<&str>, output: Option<&str>, numerator: &str,
                            denominator: &str, col_name: &str, line_parser: LineParser)
                            -> Result<Value, Error> {
-    eprintln!("Input: {}", input.unwrap_or("<STDIN>"));
-    eprintln!("Output: {}", output.unwrap_or("<STDOUT>"));
-    eprintln!("Numerator col: {}", numerator);
-    eprintln!("Denominator col: {}", denominator);
     let reader =
         TsvReader::new(BufReader::new(file_or_stdin(input)?), line_parser)?;
     let i_numerator = reader.col_to_i(numerator)?;
     let i_denominator = reader.col_to_i(denominator)?;
-    eprintln!("i_numerator: {}", i_numerator);
-    eprintln!("i_denominator: {}", i_denominator);
     let out_header = {
         let mut out_header = reader.header.clone();
         out_header.push(col_name.to_string());
