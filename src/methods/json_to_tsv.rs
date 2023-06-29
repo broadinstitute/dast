@@ -57,7 +57,7 @@ fn write_row(writer: &mut Writer, mut value_map: ValueMap, header: &[String])
              -> Result<(), Error> {
     let line =
         header.iter().map(|key| value_map.remove(key)
-            .map(|value| value.to_string()).unwrap_or_else(|| "".to_string()))
+            .map(json_value_to_string).unwrap_or_else(|| "".to_string()))
             .collect::<Vec<String>>().join("\t");
     if !value_map.is_empty() {
         for (key, value) in value_map {
@@ -66,4 +66,12 @@ fn write_row(writer: &mut Writer, mut value_map: ValueMap, header: &[String])
     }
     writer.write_fmt(format_args!("{}\n", line))?;
     Ok(())
+}
+
+fn json_value_to_string(value: JsonValue) -> String {
+    if let JsonValue::String(json_string) =  value {
+        json_string
+    } else {
+        value.to_string()
+    }
 }
