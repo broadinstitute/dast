@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 use std::fs::File;
-use std::io::{BufRead, BufReader, Error as IoError};
+use std::io::{BufRead, BufReader, Error as IoError, Write};
 use crate::data::line_parser::LineParser;
 use crate::error::Error;
 
@@ -8,6 +8,10 @@ pub(crate) struct TsvReader {
     line_parser: LineParser,
     pub(crate) header: Vec<String>,
     lines: Box<dyn Iterator<Item=Result<String, IoError>>>,
+}
+
+pub(crate) struct TsvWriter<W: Write> {
+    inner: W,
 }
 
 fn error_missing_col(col: &str) -> Error {
@@ -58,5 +62,17 @@ impl Iterator for TsvReader {
             Some(Err(io_error)) => { Some(Err(Error::from(io_error))) }
             Some(Ok(string)) => { Some(self.line_parser.parse(&string)) }
         }
+    }
+}
+
+impl<W: Write> TsvWriter<W> {
+    pub(crate) fn new(inner: W, header: &[String]) -> Result<TsvWriter<W>, Error> {
+        let mut tsv_writer = TsvWriter { inner };
+        tsv_writer.write(header)?;
+        Ok(tsv_writer)
+    }
+    pub(crate) fn write(&mut self, fields: &[String]) -> Result<(), Error> {
+        self.inner.write_fmt(format_args!("{}\n", fields.join("\t")))?;
+        Ok(())
     }
 }

@@ -1,6 +1,6 @@
-use std::io::{BufReader, BufWriter, Write};
+use std::io::{BufReader, BufWriter};
 use crate::data::line_parser::LineParser;
-use crate::data::tsv::TsvReader;
+use crate::data::tsv::{TsvReader, TsvWriter};
 use crate::error::Error;
 use crate::lang::value::Value;
 use crate::methods::util::io::{file_or_stdin, file_or_stdout};
@@ -25,14 +25,21 @@ pub(crate) fn add_quotient(input: Option<&str>, output: Option<&str>, numerator:
     let i_denominator = reader.col_to_i(denominator)?;
     eprintln!("i_numerator: {}", i_numerator);
     eprintln!("i_denominator: {}", i_denominator);
-    let mut writer = BufWriter::new(file_or_stdout(output)?);
-    writer.write_fmt(format_args!("{}\t{}\n", reader.header.join("\t"), col_name))?;
+    let out_header = {
+        let mut out_header = reader.header.clone();
+        out_header.push(col_name.to_string());
+        out_header
+    };
+    let mut writer =
+        TsvWriter::new(BufWriter::new(file_or_stdout(output)?),
+                       &out_header)?;
     for row in reader {
-        let row = row?;
+        let mut row = row?;
         let quot_str =
             calculate_quotient(&row, i_numerator, i_denominator)
                 .map(|quot| quot.to_string()).unwrap_or("NA".to_string());
-        writer.write_fmt(format_args!("{}\t{}\n", row.join("\t"), quot_str))?;
+        row.push(quot_str);
+        writer.write(&row)?;
     }
     Ok(Value::Unit)
 }
